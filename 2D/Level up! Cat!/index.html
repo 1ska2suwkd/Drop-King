@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Level up! cat!</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+  <style>
+    body { margin: 0; background-color: black; }
+    canvas { display: block; margin: auto; }
+  </style>
+</head>
+<body>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <script type="module">
+    // ------------------- 데이터 모듈 임포트 -------------------
+    import masterItemList from './items.js';
+    import { playerData, saveData, loadData, resetData} from './playerData.js';
+
+
+    // ------------------- 시작 씬 (StartScene) -------------------
+    class StartScene extends Phaser.Scene {
+      constructor() {
+        super('StartScene');
+      }
+
+      preload() {
+        this.load.image('startBackground', 'startBackground.jpeg'); 
+        this.load.image('title', 'title.png');
+        this.load.image('gameStart', 'gameStart.png');
+        this.load.image('codex', 'codex.png');
+        
+        // 아이템 스프라이트 시트 로드 (도감 및 게임 씬에서 사용)
+        this.load.spritesheet('item', 'itemSheet.png', {
+          frameWidth: 16,
+          frameHeight: 16
+        });
+      }
+
+      create() {
+        // 게임 시작 시 플레이어 데이터 불러오기
+        loadData();
+
+        this.add.image(400, 300, 'startBackground').setScale(1.9);
+        this.add.image(400, 180, 'title').setOrigin(0.5).setScale(0.5);
+        const startButton = this.add.image(400, 320, 'gameStart')
+            .setOrigin(0.5).setScale(0.3).setInteractive();
+        const codexButton = this.add.image(400, 400, 'codex')
+            .setOrigin(0.5).setScale(0.2).setInteractive();
+
+        startButton.on('pointerdown', () => this.scene.start('MainGameScene'));
+        codexButton.on('pointerdown', () => this.scene.start('CodexScene'));
+      
+        const resetButton = this.add.text(720, 560, '데이터 초기화', {
+              fontSize: '18px',
+              fill: '#FF0000', // 빨간색
+              fontFamily: 'Arial', // 폰트 설정 (원하는 폰트로 변경 가능)
+              backgroundColor: '#333333', // 배경색을 어둡게 하여 글씨가 잘 보이도록
+              padding: { x: 10, y: 5 }
+          })
+          .setOrigin(0.5) // 중앙 정렬
+          .setInteractive() // 클릭 가능하게 설정
+          .setDepth(1); // 다른 요소 위에 표시되도록 Z-index 설정 (선택 사항)
+
+          // 버튼 클릭 이벤트 리스너
+          resetButton.on('pointerdown', () => {
+              // resetData 함수 호출하여 데이터 초기화
+              resetData();
+              // 사용자에게 알림 (Phaser Text로 간단한 메시지 표시)
+              const alertText = this.add.text(400, 300, '데이터가 초기화되었습니다!', {
+                  fontSize: '30px',
+                  fill: '#FFFFFF',
+                  backgroundColor: '#000000',
+                  padding: { x: 20, y: 10 }
+              }).setOrigin(0.5).setDepth(10); // 가장 위에 표시
+
+              // 텍스트가 잠시 보였다가 사라지도록 트윈 추가
+              this.tweens.add({
+                  targets: alertText,
+                  alpha: 0,
+                  ease: 'Power1',
+                  duration: 2000,
+                  delay: 1000, // 1초 후 사라지기 시작
+                  onComplete: () => {
+                      alertText.destroy(); // 트윈 완료 후 텍스트 제거
+                      // 데이터 초기화 후 StartScene을 다시 시작하여 UI 갱신 (선택 사항)
+                      // this.scene.restart();
+                  }
+              });
+          });
+
+          // 마우스 오버 시 스타일 변경 (선택 사항)
+          resetButton.on('pointerover', () => resetButton.setStyle({ fill: '#FFFF00' })); // 노란색으로 변경
+          resetButton.on('pointerout', () => resetButton.setStyle({ fill: '#FF0000' })); // 다시 빨간색으로
+        }
+      }
+    
+
+    // ------------------- 메인 게임 씬 (MainGameScene) -------------------
+  class MainGameScene extends Phaser.Scene {
+    constructor() {
+      super('MainGameScene');
+      this.player = null;
+      this.cursors = null;
+      this.xpOrbs = null;
+      this.xp = 0;
+      this.level = 1;
+      this.xpBar = null;
+      this.levelText = null;
+      this.boxTypes = {};
+      this.itemAnimationQueue = [];
+      this.isAnimationPlaying = false; // ✨ 새로운 플래그 추가 ✨: 현재 레벨업 애니메이션이 재생 중인지
+    }
+
+    preload() {
+      this.load.spritesheet('playerSpriteSheet', 'player.png', {
+        frameWidth: 32,
+        frameHeight: 32,
+      });
+      this.load.image('background', 'background.png');
+      this.load.spritesheet('xpOrbs', 'xpOrbSheet.png', {
+        frameWidth: 275,
+        frameHeight: 275
+      });
+      this.load.spritesheet('chest', 'chestSheet.png', {
+        frameWidth: 48,
+        frameHeight: 40
+      });
+      // StartScene에도 있지만, 명확성을 위해 MainGameScene에도 로드
+      this.load.spritesheet('item', 'itemSheet.png', {
+        frameWidth: 16, // 실제 itemSheet.png의 프레임 폭과 높이에 맞게 수정
+        frameHeight: 16
+      });
+    }
+
+    create() {
+      this.isAnimationPlaying = false;
+      this.itemAnimationQueue = [];
+      this.boxTypes = {
+        'boxS': [1], 'boxA': [2], 'boxB': [3], 'boxC': [4, 5, 6], 'boxD': [7]
+      };
+
+      this.add.image(400, 300, 'background').setScale(1.9).setDepth(-1);
+      this.xpBar = this.add.graphics().setDepth(2);
+      this.updateXpBar();
+      this.levelText = this.add.text(395, 545, `${this.level}`, {
+        fontSize: '20px', fill: '#00ff00', fontFamily: 'Minecraft',
+      }).setDepth(2);
+
+      this.player = this.physics.add.sprite(400, 300, 'playerSpriteSheet', 0);
+      this.player.setScale(4);
+      this.player.setCollideWorldBounds(false);
+
+      this.anims.create({
+        key: 'player_walk_stop',
+        frames: this.anims.generateFrameNumbers('playerSpriteSheet', { start: 0, end: 3 }),
+        frameRate: 4,
+        repeat: -1
+      });
+
+      this.anims.create({
+        key: 'player_walk_down',
+        frames: this.anims.generateFrameNumbers('playerSpriteSheet', { start: 20, end: 27 }),
+        frameRate: 10,
+        repeat: -1
+      });
+
+      this.anims.create({
+        key: 'player_walk_left',
+        frames: this.anims.generateFrameNumbers('playerSpriteSheet', { start: 28, end: 35 }),
+        frameRate: 10,
+        repeat: -1
+      });
+
+      this.anims.create({
+        key: 'player_walk_right',
+        frames: this.anims.generateFrameNumbers('playerSpriteSheet', { start: 36, end: 43 }),
+        frameRate: 10,
+        repeat: -1
+      });
+
+      this.anims.create({
+        key: 'player_walk_up',
+        frames: this.anims.generateFrameNumbers('playerSpriteSheet', { start: 44, end: 51 }),
+        frameRate: 10,
+        repeat: -1
+      });
+      this.cursors = this.input.keyboard.createCursorKeys();
+      this.xpOrbs = this.physics.add.group();
+      this.physics.add.overlap(this.player, this.xpOrbs, this.collectXpOrb, null, this);
+
+      this.anims.create({ key: 'orbSpin', frames: this.anims.generateFrameNumbers('xpOrbs', { start: 0, end: 11 }), frameRate: 10, repeat: -1 });
+      this.createBoxAnimations();
+      this.time.addEvent({ delay: 1000, callback: this.spawnXpOrbs, callbackScope: this, loop: true });
+      this.input.keyboard.on('keydown-ESC', this.handleEscapeKey, this);
+    }
+
+    handleEscapeKey() {
+      this.scene.start('StartScene');
+    }
+
+    createBoxAnimations() {
+      Object.keys(this.boxTypes).forEach((boxType) => {
+        const frames = this.getFramesForBox(boxType);
+        this.anims.create({ key: boxType, frames: this.anims.generateFrameNumbers('chest', { start: frames.start, end: frames.end }), frameRate: 10, repeat: 0 });
+      });
+    }
+
+    getFramesForBox(boxType) {
+      const framesMap = { 'boxS': { start: 63, end: 83 }, 'boxA': { start: 0, end: 20 }, 'boxB': { start: 126, end: 146 }, 'boxC': { start: 21, end: 41 }, 'boxD': { start: 168, end: 188 } };
+      return framesMap[boxType] || { start: 0, end: 0 };
+    }
+
+    collectXpOrb(player, orb) {
+      orb.destroy();
+      this.xp += orb.xpValue;
+
+      let leveledUpThisCall = false;
+
+      while (this.xp >= this.getMaxXp(this.level)) {
+        this.xp -= this.getMaxXp(this.level);
+        this.level++;
+        leveledUpThisCall = true;
+      }
+
+      if (leveledUpThisCall) {
+        this.itemAnimationQueue.push({ type: 'levelUpAnimation' });
+
+        // ✨ 수정된 조건: 현재 애니메이션이 재생 중이 아닐 때만 큐 처리를 시작합니다. ✨
+        if (!this.isAnimationPlaying) {
+          this.processAnimationQueue();
+        }
+      }
+
+      this.levelText.setText(this.level);
+      this.updateXpBar();
+    }
+
+    processAnimationQueue() {
+      // 큐가 비어있으면 더 이상 처리할 애니메이션이 없으므로 종료합니다.
+      if (this.itemAnimationQueue.length === 0) {
+        this.isAnimationPlaying = false; // ✨ 큐가 비면 애니메이션 재생 상태를 false로 설정 ✨
+        return;
+      }
+
+      // ✨ 애니메이션 재생 시작을 알립니다. ✨
+      this.isAnimationPlaying = true;
+
+      // 큐에서 다음 애니메이션 요청을 가져옵니다.
+      const animationRequest = this.itemAnimationQueue.shift();
+
+      if (animationRequest.type === 'levelUpAnimation') {
+        const chest = this.add.sprite(400, 300, 'chest').setScale(6).setDepth(5);
+        const animationKey = this.getRandomBoxAnimation();
+
+        chest.play(animationKey);
+        chest.on(Phaser.Animations.Events.ANIMATION_COMPLETE, (anim) => {
+          if (anim.key === animationKey) {
+            const itemIds = this.boxTypes[animationKey];
+            const randomItemId = Phaser.Math.RND.pick(itemIds);
+            const itemData = masterItemList.find(item => item.id === randomItemId);
+
+            if (!itemData) {
+              chest.destroy();
+              // 아이템을 찾지 못했으므로 다음 큐 항목을 바로 처리합니다.
+              this.processAnimationQueue();
+              return;
+            }
+
+            this.registerItemInCodex(itemData.id);
+
+            const itemSprite = this.add.sprite(chest.x, chest.y, 'item', itemData.frame).setScale(10).setDepth(5);
+            const itemNameText = this.add.text(chest.x, chest.y - 60, itemData.name, {
+              fontSize: '30px', fill: '#ffffff', fontFamily: '"Press Start 2P"', stroke: '#000000', strokeThickness: 2,
+            }).setOrigin(0.5).setDepth(6);
+
+            this.tweens.add({
+              targets: itemSprite, y: chest.y - 100, ease: 'Power2', duration: 800,
+              onComplete: () => {
+                // 아이템 텍스트와 스프라이트가 완전히 사라지는 딜레이 (3000ms) 후에 다음 큐 항목 처리
+                this.time.delayedCall(2500, () => {
+                  itemSprite.destroy();
+                  itemNameText.destroy();
+                  chest.destroy();
+
+                  // ✨ 현재 애니메이션 시퀀스가 완전히 끝났으므로 다음 큐 항목을 처리합니다. ✨
+                  this.processAnimationQueue();
+                });
+              }
+            });
+          }
+        });
+      }
+    }
+
+    registerItemInCodex(itemId) {
+      if (!playerData.discoveredItems.has(itemId)) {
+        playerData.discoveredItems.add(itemId);
+        saveData();
+        const alertText = this.add.text(400, 100, '새로운 아이템 도감에 등록!', {
+          fontSize: '20px', fill: '#FFD700', stroke: '#000', strokeThickness: 2
+        }).setOrigin(0.5).setDepth(10);
+        this.tweens.add({ targets: alertText, alpha: 0, ease: 'Linear', duration: 2000, onComplete: () => alertText.destroy() });
+      }
+    }
+
+    getRandomBoxAnimation() {
+      const rand = Phaser.Math.Between(1, 100);
+      if (rand <= 10) return 'boxS';
+      if (rand <= 25) return 'boxA';
+      if (rand <= 45) return 'boxB';
+      if (rand <= 70) return 'boxC';
+      return 'boxD';
+    }
+
+    update() {
+      const speed = 400;
+      let vx = 0, vy = 0;
+      let isMoving = false;
+      let targetAnim = '';
+
+      if (this.cursors.left.isDown) {
+        vx = -speed;
+        isMoving = true;
+      } else if (this.cursors.right.isDown) {
+        vx = speed;
+        isMoving = true;
+      }
+
+      if (this.cursors.up.isDown) {
+        vy = -speed;
+        isMoving = true;
+      } else if (this.cursors.down.isDown) {
+        vy = speed;
+        isMoving = true;
+      }
+
+      this.player.setVelocity(vx, vy);
+
+      if (isMoving) {
+        if (this.cursors.left.isDown) {
+          targetAnim = 'player_walk_left';
+        } else if (this.cursors.right.isDown) {
+          targetAnim = 'player_walk_right';
+        } else if (this.cursors.up.isDown) {
+          targetAnim = 'player_walk_up';
+        } else if (this.cursors.down.isDown) {
+          targetAnim = 'player_walk_down';
+        }
+        if (this.player.anims.currentAnim === null || this.player.anims.currentAnim.key !== targetAnim) {
+          this.player.play(targetAnim);
+        }
+      } else {
+        targetAnim = 'player_walk_stop'
+        if (this.player.anims.currentAnim === null || this.player.anims.currentAnim.key !== targetAnim) {
+          this.player.play(targetAnim);
+        }
+      }
+
+      const width = this.sys.game.config.width;
+      const height = this.sys.game.config.height;
+
+      if (this.player.x < 0) this.player.x = width; else if (this.player.x > width) this.player.x = 0;
+      if (this.player.y < 0) this.player.y = height; else if (this.player.y > height) this.player.y = 0;
+
+      this.xpOrbs.getChildren().forEach(orb => {
+        const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, orb.x, orb.y);
+        if (distance < 175) {
+          if (orb.body.velocity.x === 0 && orb.body.velocity.y === 0) {
+            this.physics.moveToObject(orb, this.player, speed * 0.4);
+          }
+        } else {
+          orb.setVelocity(0, 0);
+        }
+      });
+    }
+    getMaxXp(level) { return 100 + (level - 1) * 20; }
+    updateXpBar() {
+      const barWidth = 200, barHeight = 10, x = 300, y = 570;
+      const fillRatio = this.xp / this.getMaxXp(this.level);
+      this.xpBar.clear();
+      this.xpBar.fillStyle(0x222222, 1).fillRect(x, y, barWidth, barHeight);
+      this.xpBar.fillStyle(0x00ff00, 1).fillRect(x, y, barWidth * fillRatio, barHeight);
+    }
+    spawnXpOrbs() {
+      const x = Phaser.Math.Between(20, 780), y = Phaser.Math.Between(20, 580);
+      const scale = Phaser.Math.FloatBetween(0.05, 0.2);
+      const orb = this.xpOrbs.create(x, y, 'xpOrbs').setScale(scale).play('orbSpin');
+      orb.xpValue = Math.round(scale * 200);
+      this.time.delayedCall(5000, () => orb.active && orb.destroy());
+    }
+  }
+    
+    // ------------------- 도감 씬 (CodexScene) -------------------
+    class CodexScene extends Phaser.Scene {
+      constructor() {
+        super('CodexScene');
+        this.descriptionText = null;
+      }
+
+      create() {
+        this.add.image(400, 300, 'startBackground').setScale(1.9).setDepth(-1);
+        this.add.text(400, 50, '📖 도감', { fontSize: '32px', fill: '#ffffff' }).setOrigin(0.5);
+
+        const startX = 120, startY = 140, itemSize = 100, columns = 6;
+
+        masterItemList.forEach((item, index) => {
+          const x = startX + (index % columns) * itemSize;
+          const y = startY + Math.floor(index / columns) * itemSize;
+          const itemIcon = this.add.sprite(x, y, 'item', item.frame).setScale(4);
+
+          if (playerData.discoveredItems.has(item.id)) {
+            itemIcon.setInteractive().on('pointerdown', () => this.showItemDescription(item));
+          } else {
+            itemIcon.setTint(0x000000); 
+          }
+        });
+        
+        this.descriptionText = this.add.text(400, 480, '아이템을 클릭하여 설명을 확인하세요.', {
+          fontSize: '16px', fill: '#ffffcc', fontFamily: 'sans-serif',
+          wordWrap: { width: 600 }, align: 'center'
+        }).setOrigin(0.5);
+
+        const backButton = this.add.text(400, 550, '← 돌아가기', {
+          fontSize: '24px', fill: '#ff4444'
+        }).setOrigin(0.5).setInteractive();
+
+        backButton.on('pointerdown', () => this.scene.start('StartScene'));
+        this.input.keyboard.on('keydown-ESC', this.handleEscapeKey, this);
+      }
+
+      handleEscapeKey() {
+        this.scene.start('StartScene');
+      }
+      
+      showItemDescription(item) {
+        if (this.descriptionText) {
+          this.descriptionText.setText(`[${item.grade}등급] ${item.name}\n\n${item.description}`);
+        }
+      }
+    }
+
+    // ------------------- 게임 설정 (Config) -------------------
+    const config = {
+      type: Phaser.AUTO,
+      width: 800,
+      height: 600,
+      backgroundColor: '#000000',
+      physics: {
+        default: 'arcade',
+        arcade: { debug: false }
+      },
+      scene: [StartScene, MainGameScene, CodexScene],
+      pixelArt: true
+    };
+
+    const game = new Phaser.Game(config);
+  </script>
+</body>
+</html>
