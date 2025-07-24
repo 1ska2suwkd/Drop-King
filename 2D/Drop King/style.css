@@ -1,0 +1,16 @@
+body{
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: black;
+}
+#game-container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+canvas{ /* Phaser가 생성하는 캔버스에 적용될 스타일 (선택 사항이지만 권장) */
+    display: block; /* 캔버스 하단에 생기는 알 수 없는 여백을 제거 */
+}
