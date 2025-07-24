@@ -12,13 +12,13 @@ export default class MainScene extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(
             this.sys.game.config.width / 2,
-            this.sys.game.config.heigt - 100,
+            this.sys.game.config.height - 100,
             'player'
         );
 
         this.anims.create({
             key: 'idle',
-            frame: [{start: 0, end: 0}],
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 0 }),
             frameRate: 1,
             repeat: -1
         })
@@ -29,6 +29,7 @@ export default class MainScene extends Phaser.Scene {
             repeat: -1
         })
         //생성하면 idle 재생
-        this.player.play('idle'); 
+        this.player.play('idle');
     }
+
 }
