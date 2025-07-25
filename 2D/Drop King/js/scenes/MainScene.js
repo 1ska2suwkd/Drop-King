@@ -12,9 +12,9 @@ export default class MainScene extends Phaser.Scene {
 
         this.player = this.physics.add.sprite(
             this.sys.game.config.width / 2,
-            this.sys.game.config.height - 100,
+            this.sys.game.config.height - 33,
             'player'
-        );
+        ).setScale(1.5);
 
         this.anims.create({
             key: 'idle',
