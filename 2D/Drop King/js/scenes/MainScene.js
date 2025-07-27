@@ -5,6 +5,9 @@ export default class MainScene extends Phaser.Scene {
         this.cursors = null;
         this.jumpPower = 0;
         this.isChargingJump = false;
+        this.isJumping = false;
+        this.leftJump = false;
+        this.rightJump = false;
         this.maxJumpPower = 800;
     }
 
@@ -67,42 +70,62 @@ export default class MainScene extends Phaser.Scene {
 
         const speed = 150;
 
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown && this.player.body.velocity.y == 0) {
             this.player.setVelocityX(-speed);
             this.player.anims.play('walk', true);
             this.player.setFlipX(true);
-        } else if (this.cursors.right.isDown) {
+        } else if (this.cursors.right.isDown && this.player.body.velocity.y == 0) {
             this.player.setVelocityX(speed);
             this.player.anims.play('walk', true);
             this.player.setFlipX(false);
-        } else {
+        } else if (this.player.body.velocity.y == 0 && !this.isJumping) {
             this.player.setVelocityX(0);
-            this.player.anims.play('idle', true);
+            this.player.setFrame(0);
         }
 
         //점프 차징
         //this.player.body.bloked.down은 플레이어가 땅에 닿아있는 지 확인하는 것
         if (this.spaceKey.isDown && this.player.body.blocked.down) {
+            if(this.cursors.left.isDown) {
+                this.leftJump = true;
+                this.rightJump = false;
+            }
+            else if (this.cursors.right.isDown) {
+                this.rightJump = true;
+                this.leftJump = false;
+            }
+            this.isJumping = true;
             this.isChargingJump = true;
-            this.jumpPower += 20;
+            this.player.setVelocityX(0);
+            this.jumpPower += 25;
             if (this.jumpPower > this.maxJumpPower) {
                 this.jumpPower = this.maxJumpPower;
-            }
+            } 
             this.player.setFrame(4);
         }
 
         //점프 발사
         //Justup은 손 뗀 순간을 의미
         if (this.isChargingJump && Phaser.Input.Keyboard.JustUp(this.spaceKey)) {
-            this.isChargingJump = false;
-            this.player.setVelocityY(-this.jumpPower)
-            this.jumpPower = 0
+            this.isJumping = true;
             this.player.setFrame(5);
+            this.player.setVelocityY(-this.jumpPower)
+            if (this.leftJump) {
+                this.player.setVelocityX(-speed);
+                this.leftJump = false;
+            } else if (this.rightJump) {
+                this.player.setVelocityX(speed);
+                this.rightJump = false;
+            }
+            this.isChargingJump = false;
+            this.jumpPower = 0
         }
 
         if (!this.player.body.blocked.down && this.player.body.velocity.y > 0 && !this.isChargingJump) {
             this.player.setFrame(6);
+            this.isJumping = false
         }
+        
     }
 
 }
