@@ -5,13 +5,13 @@ export default class MainScene extends Phaser.Scene {
         this.cursors = null;
         this.jumpPower = 0;
         this.isChargingJump = false;
-        this.maxJumpPower = 500;
+        this.maxJumpPower = 800;
     }
 
     create() {
         //충돌 영역이 있는 배경 생성하기
         const map = this.make.tilemap({ key: 'map' });
-        this.add.image(150, -25, 'background1').setOrigin(0, 0);
+        this.add.image(88, -25, 'background1').setOrigin(0, 0);
 
         this.ground = this.physics.add.staticGroup();
 
@@ -19,17 +19,15 @@ export default class MainScene extends Phaser.Scene {
 
         if (groundLayer && groundLayer.objects) {
             groundLayer.objects.forEach(obj => {
-                const ground = this.ground.create(
-                    obj.x + obj.width / 2,
-                    obj.y - obj.height / 2,
-                    null
+                const rect = this.add.rectangle(
+                    obj.x + obj.width,
+                    obj.y + obj.height / 2,
+                    obj.width,
+                    obj.height,
                 );
-                ground.setSize(obj.width, obj.height).setVisible(false).refreshBody();
+                this.physics.add.existing(rect, true); // true → static body
+                this.ground.add(rect);
             });
-        }
-
-        if (this.ground && this.ground.getLength() > 0) {
-            this.physics.add.collider(this.player, this.ground);
         }
 
         //플레이어, 애니메이션 생성
@@ -54,6 +52,9 @@ export default class MainScene extends Phaser.Scene {
         //생성하면 idle 재생
         this.player.play('idle');
 
+        this.ground.getChildren().forEach(groundObj => {
+            this.physics.add.collider(this.player, groundObj);
+        });
 
         this.cursors = this.input.keyboard.createCursorKeys();
         //spacekey를 새로 정의하는 이유는 Justup을 사용하기 위함이다.
@@ -83,7 +84,7 @@ export default class MainScene extends Phaser.Scene {
         //this.player.body.bloked.down은 플레이어가 땅에 닿아있는 지 확인하는 것
         if (this.spaceKey.isDown && this.player.body.blocked.down) {
             this.isChargingJump = true;
-            this.jumpPower += 10;
+            this.jumpPower += 20;
             if (this.jumpPower > this.maxJumpPower) {
                 this.jumpPower = this.maxJumpPower;
             }
@@ -92,7 +93,7 @@ export default class MainScene extends Phaser.Scene {
 
         //점프 발사
         //Justup은 손 뗀 순간을 의미
-        if (this.isChargingJump && Phaser.Input.Keyboard.Justup(this.spaceKey)) {
+        if (this.isChargingJump && Phaser.Input.Keyboard.JustUp(this.spaceKey)) {
             this.isChargingJump = false;
             this.player.setVelocityY(-this.jumpPower)
             this.jumpPower = 0
