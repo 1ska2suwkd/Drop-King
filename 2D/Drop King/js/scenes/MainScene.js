@@ -43,15 +43,33 @@ export default class MainScene extends Phaser.Scene {
         this.anims.create({
             key: 'idle',
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 0 }),
-            frameRate: 1,
+            frameRate: 10,
             repeat: -1
-        })
+        });
         this.anims.create({
             key: 'walk',
             frames: this.anims.generateFrameNumbers('player', { start: 1, end: 3 }),
             frameRate: 10,
             repeat: -1
-        })
+        });
+        this.anims.create({
+            key: 'chargingJump',
+            frames: this.anims.generateFrameNumbers('player', {start: 4, end: 4}),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'jumpUp',
+            frames: this.anims.generateFrameNumbers('player', {start: 5, end: 5}),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'jumpFall',
+            frames: this.anims.generateFrameNumbers('player', {start: 6, end: 6}),
+            frameRate: 10,
+            repeat: -1
+        });
         //생성하면 idle 재생
         this.player.play('idle');
 
@@ -70,29 +88,18 @@ export default class MainScene extends Phaser.Scene {
 
         const speed = 150;
 
-        if (this.cursors.left.isDown && this.player.body.velocity.y == 0) {
-            this.player.setVelocityX(-speed);
-            this.player.anims.play('walk', true);
-            this.player.setFlipX(true);
-        } else if (this.cursors.right.isDown && this.player.body.velocity.y == 0) {
-            this.player.setVelocityX(speed);
-            this.player.anims.play('walk', true);
-            this.player.setFlipX(false);
-        } else if (this.player.body.velocity.y == 0 && !this.isJumping) {
-            this.player.setVelocityX(0);
-            this.player.setFrame(0);
-        }
-
         //점프 차징
         //this.player.body.bloked.down은 플레이어가 땅에 닿아있는 지 확인하는 것
         if (this.spaceKey.isDown && this.player.body.blocked.down) {
-            if(this.cursors.left.isDown) {
+            if (this.cursors.left.isDown) {
                 this.leftJump = true;
                 this.rightJump = false;
+                this.player.setFlipX(true);
             }
             else if (this.cursors.right.isDown) {
                 this.rightJump = true;
                 this.leftJump = false;
+                this.player.setFlipX(false);
             }
             this.isJumping = true;
             this.isChargingJump = true;
@@ -100,15 +107,15 @@ export default class MainScene extends Phaser.Scene {
             this.jumpPower += 25;
             if (this.jumpPower > this.maxJumpPower) {
                 this.jumpPower = this.maxJumpPower;
-            } 
-            this.player.setFrame(4);
+            }
+            this.player.anims.play('chargingJump', true);
         }
 
         //점프 발사
         //Justup은 손 뗀 순간을 의미
         if (this.isChargingJump && Phaser.Input.Keyboard.JustUp(this.spaceKey)) {
             this.isJumping = true;
-            this.player.setFrame(5);
+            this.player.anims.play('jumpUp', true);
             this.player.setVelocityY(-this.jumpPower)
             if (this.leftJump) {
                 this.player.setVelocityX(-speed);
@@ -122,10 +129,26 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (!this.player.body.blocked.down && this.player.body.velocity.y > 0 && !this.isChargingJump) {
-            this.player.setFrame(6);
-            this.isJumping = false
-        }
-        
-    }
+            this.player.anims.play('jumpFall', true);
 
+        }
+
+        if (this.player.body.blocked.down && !this.isChargingJump) {
+            this.isJumping = false;
+        }
+
+        if (this.cursors.left.isDown && this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
+            this.player.setVelocityX(-speed);
+            this.player.anims.play('walk', true);
+            this.player.setFlipX(true);
+        } else if (this.cursors.right.isDown && this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
+            this.player.setVelocityX(speed);
+            this.player.anims.play('walk', true);
+            this.player.setFlipX(false);
+        } else if (this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
+            this.player.setVelocityX(0);
+            this.player.setFrame(0); // 여기를 애니메이션으로 바꾸면 점프가 이상해짐. 
+        }
+
+    }
 }
