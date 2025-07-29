@@ -54,19 +54,19 @@ export default class MainScene extends Phaser.Scene {
         });
         this.anims.create({
             key: 'chargingJump',
-            frames: this.anims.generateFrameNumbers('player', {start: 4, end: 4}),
+            frames: this.anims.generateFrameNumbers('player', { start: 4, end: 4 }),
             frameRate: 10,
             repeat: -1
         });
         this.anims.create({
             key: 'jumpUp',
-            frames: this.anims.generateFrameNumbers('player', {start: 5, end: 5}),
+            frames: this.anims.generateFrameNumbers('player', { start: 5, end: 5 }),
             frameRate: 10,
             repeat: -1
         });
         this.anims.create({
             key: 'jumpFall',
-            frames: this.anims.generateFrameNumbers('player', {start: 6, end: 6}),
+            frames: this.anims.generateFrameNumbers('player', { start: 6, end: 6 }),
             frameRate: 10,
             repeat: -1
         });
@@ -87,68 +87,88 @@ export default class MainScene extends Phaser.Scene {
         if (!this.player || !this.cursors) return;
 
         const speed = 150;
+        const onGround = this.player.body.touching.down;
 
-        //점프 차징
-        //this.player.body.bloked.down은 플레이어가 땅에 닿아있는 지 확인하는 것
-        if (this.spaceKey.isDown && this.player.body.blocked.down) {
-            if (this.cursors.left.isDown) {
-                this.leftJump = true;
-                this.rightJump = false;
-                this.player.setFlipX(true);
-            }
-            else if (this.cursors.right.isDown) {
-                this.rightJump = true;
-                this.leftJump = false;
-                this.player.setFlipX(false);
-            }
-            this.isJumping = true;
-            this.isChargingJump = true;
-            this.player.setVelocityX(0);
-            this.jumpPower += 25;
-            if (this.jumpPower > this.maxJumpPower) {
-                this.jumpPower = this.maxJumpPower;
-            }
-            this.player.anims.play('chargingJump', true);
-        }
-
-        //점프 발사
-        //Justup은 손 뗀 순간을 의미
-        if (this.isChargingJump && Phaser.Input.Keyboard.JustUp(this.spaceKey)) {
-            this.isJumping = true;
-            this.player.anims.play('jumpUp', true);
-            this.player.setVelocityY(-this.jumpPower)
-            if (this.leftJump) {
-                this.player.setVelocityX(-speed);
-                this.leftJump = false;
-            } else if (this.rightJump) {
-                this.player.setVelocityX(speed);
-                this.rightJump = false;
-            }
-            this.isChargingJump = false;
-            this.jumpPower = 0
-        }
-
-        if (!this.player.body.blocked.down && this.player.body.velocity.y > 0 && !this.isChargingJump) {
-            this.player.anims.play('jumpFall', true);
-
-        }
-
-        if (this.player.body.blocked.down && !this.isChargingJump) {
+        // 플레이어가 땅에 있을 때
+        if (onGround) {
             this.isJumping = false;
+
+            // 스페이스바를 누르고 있을 때 (점프 차지)
+            if (this.spaceKey.isDown) {
+                if (!this.isChargingJump) {
+                    // 차지를 막 시작한 경우
+                    this.isChargingJump = true;
+                    this.player.play('chargingJump', true);
+                    this.player.setVelocityX(0); // 차지 중에는 이동 정지
+                    this.jumpPower = 0;
+                    this.leftJump = false;  // [추가] 점프 방향 초기화
+                    this.rightJump = false; // [추가] 점프 방향 초기화
+                }
+
+                // 점프 파워 충전
+                if (this.jumpPower < this.maxJumpPower) {
+                    this.jumpPower += 20;
+                }
+
+                // [수정] 차지 중 점프 방향 결정
+                if (this.cursors.left.isDown) {
+                    this.player.flipX = true;
+                    this.leftJump = true;
+                    this.rightJump = false;
+                } else if (this.cursors.right.isDown) {
+                    this.player.flipX = false;
+                    this.rightJump = true;
+                    this.leftJump = false;
+                } else {
+                    // 방향키를 안누르면 제자리 점프 준비
+                    this.leftJump = false;
+                    this.rightJump = false;
+                }
+
+            } else { // 스페이스바를 누르고 있지 않을 때
+                // 차지 중이었다면 점프 실행
+                if (this.isChargingJump) {
+                    this.isChargingJump = false;
+                    this.isJumping = true;
+
+                    // 수직 점프 실행
+                    this.player.setVelocityY(-this.jumpPower);
+
+                    // [수정] 결정된 방향에 따라 수평 점프 실행
+                    const jumpHorizontalSpeed = 250;
+                    if (this.leftJump) {
+                        this.player.setVelocityX(-jumpHorizontalSpeed);
+                    } else if (this.rightJump) {
+                        this.player.setVelocityX(jumpHorizontalSpeed);
+                    } else {
+                        // 제자리 점프
+                        this.player.setVelocityX(0);
+                    }
+                } else {
+                    // 일반 이동 (차지하지 않았을 때)
+                    if (this.cursors.left.isDown) {
+                        this.player.setVelocityX(-speed);
+                        this.player.flipX = true;
+                        this.player.play('walk', true);
+                    } else if (this.cursors.right.isDown) {
+                        this.player.setVelocityX(speed);
+                        this.player.flipX = false;
+                        this.player.play('walk', true);
+                    } else {
+                        this.player.setVelocityX(0);
+                        this.player.play('idle', true);
+                    }
+                }
+            }
         }
 
-        if (this.cursors.left.isDown && this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
-            this.player.setVelocityX(-speed);
-            this.player.anims.play('walk', true);
-            this.player.setFlipX(true);
-        } else if (this.cursors.right.isDown && this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
-            this.player.setVelocityX(speed);
-            this.player.anims.play('walk', true);
-            this.player.setFlipX(false);
-        } else if (this.player.body.blocked.down && !this.isJumping && !this.isChargingJump) {
-            this.player.setVelocityX(0);
-            this.player.setFrame(0); // 여기를 애니메이션으로 바꾸면 점프가 이상해짐. 
+        // 공중에 있을 때 애니메이션
+        if (!onGround) {
+            if (this.player.body.velocity.y < 0) {
+                this.player.play('jumpUp', true);
+            } else if (this.player.body.velocity.y > 0) {
+                this.player.play('jumpFall', true);
+            }
         }
-
     }
 }
