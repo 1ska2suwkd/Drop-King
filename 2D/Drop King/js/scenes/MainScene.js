@@ -6,6 +6,7 @@ export default class MainScene extends Phaser.Scene {
         this.jumpPower = 0;
         this.isChargingJump = false;
         this.isJumping = false;
+        this.isDrop = false;
         this.leftJump = false;
         this.rightJump = false;
         this.maxJumpPower = 800;
@@ -89,28 +90,24 @@ export default class MainScene extends Phaser.Scene {
         const speed = 150;
         const onGround = this.player.body.touching.down;
 
-        // 플레이어가 땅에 있을 때
         if (onGround) {
             this.isJumping = false;
+            this.isDrop = false;
 
-            // 스페이스바를 누르고 있을 때 (점프 차지)
             if (this.spaceKey.isDown) {
                 if (!this.isChargingJump) {
-                    // 차지를 막 시작한 경우
                     this.isChargingJump = true;
                     this.player.play('chargingJump', true);
                     this.player.setVelocityX(0); // 차지 중에는 이동 정지
                     this.jumpPower = 0;
-                    this.leftJump = false;  // [추가] 점프 방향 초기화
-                    this.rightJump = false; // [추가] 점프 방향 초기화
+                    this.leftJump = false;  
+                    this.rightJump = false; 
                 }
 
-                // 점프 파워 충전
                 if (this.jumpPower < this.maxJumpPower) {
                     this.jumpPower += 20;
                 }
 
-                // [수정] 차지 중 점프 방향 결정
                 if (this.cursors.left.isDown) {
                     this.player.flipX = true;
                     this.leftJump = true;
@@ -134,14 +131,12 @@ export default class MainScene extends Phaser.Scene {
                     // 수직 점프 실행
                     this.player.setVelocityY(-this.jumpPower);
 
-                    // [수정] 결정된 방향에 따라 수평 점프 실행
-                    const jumpHorizontalSpeed = 250;
+                    const jumpHorizontalSpeed = 200;
                     if (this.leftJump) {
                         this.player.setVelocityX(-jumpHorizontalSpeed);
                     } else if (this.rightJump) {
                         this.player.setVelocityX(jumpHorizontalSpeed);
                     } else {
-                        // 제자리 점프
                         this.player.setVelocityX(0);
                     }
                 } else {
@@ -162,9 +157,16 @@ export default class MainScene extends Phaser.Scene {
             }
         }
 
-        // 공중에 있을 때 애니메이션
         if (!onGround) {
-            if (this.player.body.velocity.y < 0) {
+            const drop = 150
+
+            if (this.spaceKey.isDown && !this.isDrop) {
+                this.player.setVelocityX(0);
+                this.player.setVelocityY(drop);
+                this.isDrop = true;
+            }
+
+            if (this.player.body.velocity.y < 0) { // player.body.velocity.y 는 palyer의 y를 기준으로 상승 하강을 구분
                 this.player.play('jumpUp', true);
             } else if (this.player.body.velocity.y > 0) {
                 this.player.play('jumpFall', true);
