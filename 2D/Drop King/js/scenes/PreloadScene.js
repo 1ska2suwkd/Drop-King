@@ -4,7 +4,8 @@ export default class PreloadScene extends Phaser.Scene{
     }
 
     preload() {
-        this.load.image('background1', 'assets/background1.png');
+        this.load.image('StartBackground', 'assets/StartScene.png');
+        this.load.image('IntroBackground', 'assets/IntroScene.png');
         this.load.tilemapTiledJSON('map', 'assets/map.json');
         this.load.spritesheet('player', 'assets/player.png',{
             frameWidth: 32,

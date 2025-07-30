@@ -1,5 +1,6 @@
 import PreloadScene from './scenes/PreloadScene.js';
 import StartScene from './scenes/StartScene.js';
+import IntroScene from './scenes/IntroScene.js';
 import GameOverScene from './scenes/GameOverScene.js'
 
 const config = { //config는 인스턴스 초기화 역할
@@ -16,11 +17,11 @@ const config = { //config는 인스턴스 초기화 역할
         default: 'arcade', //아케이드 물리엔진, 2d의 적합
         arcade: {
             gravity: {y: 1000}, //중력 설정
-            debug: false //디버그 시각화 여부
+            debug: true //디버그 시각화 여부
         }
         
     },
-    scene: [PreloadScene, StartScene, GameOverScene]
+    scene: [PreloadScene, StartScene, IntroScene, GameOverScene]
 };
 
 const game = new Phaser.Game(config);

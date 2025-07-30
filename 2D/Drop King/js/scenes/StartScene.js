@@ -7,7 +7,7 @@ export default class StartScene extends Phaser.Scene {
     create() {
         //충돌 영역이 있는 배경 생성하기
         const map = this.make.tilemap({ key: 'map' });
-        this.add.image(80, -25, 'background1').setOrigin(0, 0);
+        this.add.image(80, -25, 'StartBackground').setOrigin(0, 0);
 
         this.ground = this.physics.add.staticGroup();
 
@@ -33,5 +33,9 @@ export default class StartScene extends Phaser.Scene {
     // update는 Phaser의 scene 클래스에서 제공하는 함수
     update() {
         this.controller.update();
+        //텐트 안으로 떨어지면 인트로 씬으로 변경
+        if (this.controller.player.y > 650) {
+            this.scene.start('IntroScene');
+        }
     }
 }
