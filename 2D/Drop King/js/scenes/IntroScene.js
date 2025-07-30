@@ -12,7 +12,7 @@ export default class IntroScene extends Phaser.Scene {
 
         // 플레이어가 하늘에서 떨어지는 것처럼 보이게 하기 위해서 10으로 설정   
         this.controller = new PlayerController(this, 400, 10);
-        this.physics.add.collider(this.controller.player, this.ground);
+        this.controller.player.flipX = true;
     }
 
     update() {
