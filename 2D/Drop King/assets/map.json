@@ -4,7 +4,7 @@
  "layers":[
         {
          "id":2,
-         "image":"..\/Documents\/\uc0c8 \ud3f4\ub354\/Drop King\/assets\/background1.png",
+         "image":"background1.png",
          "imageheight":666,
          "imagewidth":666,
          "name":"background",
@@ -28,8 +28,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":396.666666666667,
-                 "x":94.5,
+                 "width":308.666666666667,
+                 "x":182.5,
                  "y":598.833333333333
                 }, 
                 {
@@ -39,7 +39,7 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":179.333333333333,
+                 "width":96.6666666666663,
                  "x":-2.166666666667,
                  "y":399.5
                 }, 
@@ -53,6 +53,61 @@
                  "width":172.666666666666,
                  "x":491.833333333333,
                  "y":400.833333333333
+                }, 
+                {
+                 "height":76,
+                 "id":12,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":149.333333333333,
+                 "x":261.333333333333,
+                 "y":197.333333333333
+                }, 
+                {
+                 "height":42.5,
+                 "id":13,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":128,
+                 "x":416.5,
+                 "y":56
+                }, 
+                {
+                 "height":874,
+                 "id":14,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":11,
+                 "x":667,
+                 "y":-236
+                }, 
+                {
+                 "height":866,
+                 "id":15,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":11,
+                 "x":-11.5,
+                 "y":-230
+                }, 
+                {
+                 "height":8,
+                 "id":20,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":666,
+                 "x":0,
+                 "y":-2
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -61,7 +116,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":12,
+ "nextobjectid":21,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
