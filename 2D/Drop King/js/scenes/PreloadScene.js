@@ -1,14 +1,18 @@
-export default class PreloadScene extends Phaser.Scene{
+export default class PreloadScene extends Phaser.Scene {
     constructor() {
         super('PreloadScene');
     }
 
     preload() {
-        this.load.image('StartBackground', 'assets/StartScene.png');
-        this.load.tilemapTiledJSON('map', 'assets/map.json');
-        this.load.image('IntroBackground', 'assets/IntroScene.png');
+        this.load.image('StartBackground', 'assets/Scene/StartScene.png');
+        this.load.tilemapTiledJSON('map', 'assets/Scene/map.json');
+        this.load.image('IntroBackground', 'assets/Scene/IntroScene.png');
         this.load.image('title', 'assets/title.png');
-        this.load.spritesheet('player', 'assets/player.png',{
+        for (let i = 1; i <= 7; i++) {
+            this.load.image(`platform${i}`, `assets/platforms/platform${i}.png`);
+        }
+
+        this.load.spritesheet('player', 'assets/player.png', {
             frameWidth: 32,
             frameHeight: 32
         });

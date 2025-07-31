@@ -34,7 +34,7 @@ export default class IntroScene extends Phaser.Scene {
         this.controller.update();
 
         if (this.controller.player.y > 650) {
-            this.scene.start('StartScene');
+            this.scene.start('MainScene');
         }
     }
 }
