@@ -130,11 +130,11 @@ export class PlayerController {
         }
 
         if (!onGround) {
-            if (spaceKey.isDown && !this.isDrop) {
-                player.setVelocityX(0);
-                player.setVelocityY(150);
-                this.isDrop = true;
-            }
+            // if (spaceKey.isDown && !this.isDrop) {
+            //     player.setVelocityX(0);
+            //     player.setVelocityY(150);
+            //     this.isDrop = true;
+            // }
 
             if (player.body.velocity.y < 0) {
                 player.play('jumpUp', true);

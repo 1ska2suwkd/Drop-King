@@ -17,7 +17,7 @@ const config = { //config는 인스턴스 초기화 역할
         default: 'arcade', //아케이드 물리엔진, 2d의 적합
         arcade: {
             gravity: {y: 1000}, //중력 설정
-            debug: true //디버그 시각화 여부
+            debug: false //디버그 시각화 여부
         }
         
     },
