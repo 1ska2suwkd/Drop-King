@@ -6,6 +6,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.add.image(80, -25, 'MainBackground').setOrigin(0, 0);
+
         // 점수 초기화
         this.score = 0;
 
@@ -16,10 +18,6 @@ export default class MainScene extends Phaser.Scene {
         // 플레이어 생성
         this.controller = new PlayerController(this, 400, 100);
         this.player = this.controller.player;
-
-        // // 카메라 플레이어 따라가기
-        // this.cameras.main.startFollow(this.player);
-        // this.cameras.main.setLerp(0.1, 0.1);
 
         // 점수 텍스트
         this.scoreText = this.add.text(10, 10, 'Score: 0', {
@@ -34,8 +32,6 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.platformGroup, this.hitPlatform, null, this);
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
 
-        // 미리보기 키 설정
-        this.previewKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
 
     spawnPlatforms() {
@@ -63,7 +59,6 @@ export default class MainScene extends Phaser.Scene {
     }
 
     hitPlatform(player, platform) {
-        // 점수 증가 후 발판과의 충돌 제거 (1회만)
         this.score += 1;
         this.scoreText.setText(`Score: ${this.score}`);
         // this.platformGroup.remove(platform);
@@ -77,17 +72,5 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         this.controller.update();
-
-        // // 너무 아래로 떨어지면 게임오버
-        // if (this.player.y > this.cameras.main.scrollY + 800) {
-        //     this.scene.start('GameOverScene');
-        // }
-
-        // 아래 미리보기 기능 (D키)
-        if (this.previewKey.isDown) {
-            this.cameras.main.setScroll(this.cameras.main.scrollX, this.player.y + 200);
-        } else {
-            this.cameras.main.startFollow(this.player);
-        }
     }
 }

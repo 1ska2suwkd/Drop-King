@@ -27,7 +27,7 @@ export default class IntroScene extends Phaser.Scene {
             ease: 'Sine.easeInOut'
         });
         
-        this.cameras.main.zoomTo(1.2, 10000);
+        // this.cameras.main.zoomTo(1.2, 10000);
     }
 
     update() {
