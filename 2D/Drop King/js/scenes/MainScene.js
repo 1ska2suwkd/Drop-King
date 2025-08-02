@@ -6,7 +6,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.image(80, -25, 'background01').setOrigin(0, 0);
+        this.background = this.add.image(0, 0, 'background1').setOrigin(0, 0).setScale(2.15);
 
         // 점수 초기화
         this.score = 0;
@@ -32,6 +32,7 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.platformGroup, this.hitPlatform, null, this);
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
 
+        this.backgroundChanged = false;
     }
 
     spawnPlatforms() {
@@ -63,6 +64,12 @@ export default class MainScene extends Phaser.Scene {
         this.scoreText.setText(`Score: ${this.score}`);
         // this.platformGroup.remove(platform);
         // platform.destroy(); // 다시 점수 못 얻게 제거
+
+        // 점수가 500 이상이 되었고 배경이 아직 바뀌지 않았다면 교체
+        if (this.score >= 500 && !this.backgroundChanged) {
+            this.background.setTexture('background2');
+            this.backgroundChanged = true;
+        }
     }
 
     hitTrap(player, trap) {
