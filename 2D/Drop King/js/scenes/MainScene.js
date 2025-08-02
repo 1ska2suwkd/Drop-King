@@ -6,7 +6,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.image(80, -25, 'MainBackground').setOrigin(0, 0);
+        this.add.image(80, -25, 'background01').setOrigin(0, 0);
 
         // 점수 초기화
         this.score = 0;

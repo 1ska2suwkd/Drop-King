@@ -4,12 +4,10 @@
  "layers":[
         {
          "id":2,
-         "image":"background1.png",
-         "imageheight":666,
+         "image":"StartScene.png",
+         "imageheight":500,
          "imagewidth":666,
          "name":"background",
-         "offsetx":1.33333333333331,
-         "offsety":-25.6666666666667,
          "opacity":1,
          "type":"imagelayer",
          "visible":true,
@@ -28,9 +26,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":308.666666666667,
-                 "x":182.5,
-                 "y":598.833333333333
+                 "width":314,
+                 "x":178,
+                 "y":457
                 }, 
                 {
                  "height":239.333333333333,
@@ -40,8 +38,8 @@
                  "type":"",
                  "visible":true,
                  "width":96.6666666666663,
-                 "x":-2.166666666667,
-                 "y":399.5
+                 "x":2,
+                 "y":255
                 }, 
                 {
                  "height":235.333333333333,
@@ -51,30 +49,19 @@
                  "type":"",
                  "visible":true,
                  "width":172.666666666666,
-                 "x":491.833333333333,
-                 "y":400.833333333333
+                 "x":491,
+                 "y":255
                 }, 
                 {
-                 "height":76,
+                 "height":65,
                  "id":12,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":149.333333333333,
-                 "x":261.333333333333,
-                 "y":197.333333333333
-                }, 
-                {
-                 "height":42.5,
-                 "id":13,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":128,
-                 "x":416.5,
-                 "y":56
+                 "x":258.333333333333,
+                 "y":58
                 }, 
                 {
                  "height":874,
@@ -106,8 +93,8 @@
                  "type":"",
                  "visible":true,
                  "width":666,
-                 "x":0,
-                 "y":-2
+                 "x":1,
+                 "y":-53
                 }],
          "opacity":1,
          "type":"objectgroup",

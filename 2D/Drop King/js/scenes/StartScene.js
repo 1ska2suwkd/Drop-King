@@ -7,7 +7,7 @@ export default class StartScene extends Phaser.Scene {
     create() {
         //충돌 영역이 있는 배경 생성하기
         const map = this.make.tilemap({ key: 'map' });
-        this.add.image(80, -25, 'StartBackground').setOrigin(0, 0);
+        this.add.image(0, 0, 'StartBackground').setOrigin(0, 0);
 
         this.ground = this.physics.add.staticGroup();
 
@@ -16,7 +16,7 @@ export default class StartScene extends Phaser.Scene {
         if (groundLayer && groundLayer.objects) {
             groundLayer.objects.forEach(obj => {
                 const rect = this.add.rectangle(
-                    obj.x + 80 + obj.width / 2,
+                    obj.x + obj.width / 2,
                     obj.y + obj.height / 2,
                     obj.width,
                     obj.height,

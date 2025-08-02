@@ -11,6 +11,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('title', 'assets/title.png');
         for (let i = 1; i <= 7; i++) {
             this.load.image(`platform${i}`, `assets/platforms/platform${i}.png`);
+        }for (let i = 1; i <= 9; i++) {
+            this.load.image(`background0${i}`, `assets/Scene/background/background0${i}.webp`);
         }
 
         this.load.spritesheet('player', 'assets/player.png', {
@@ -21,5 +23,6 @@ export default class PreloadScene extends Phaser.Scene {
 
     create() {
         this.scene.start('StartScene');
+        // this.scene.start('MainScene');
     }
 }

@@ -6,8 +6,8 @@ import GameOverScene from './scenes/GameOverScene.js'
 
 const config = { //config는 인스턴스 초기화 역할
     type: Phaser.AUTO, //랜더링 방식
-    width: 800,
-    height: 600,
+    width: 666,
+    height: 500,
     parent: 'game-container',
     pixelArt: true,
     scale: {
