@@ -89,7 +89,7 @@ export class PlayerController {
                     player.flipX = false;
                     this.rightJump = true;
                     this.leftJump = false;
-                // 방향키를 안누르면 제자리 점프 준비
+                    // 방향키를 안누르면 제자리 점프 준비
                 } else {
                     this.leftJump = false;
                     this.rightJump = false;
@@ -108,7 +108,7 @@ export class PlayerController {
                         player.setVelocityX(-jumpHorizontalSpeed);
                     } else if (this.rightJump) {
                         player.setVelocityX(jumpHorizontalSpeed);
-                    } else { 
+                    } else {
                         player.setVelocityX(0);
                     }
                 } else {

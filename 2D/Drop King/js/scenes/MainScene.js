@@ -15,8 +15,18 @@ export default class MainScene extends Phaser.Scene {
         this.platformGroup = this.physics.add.staticGroup();
         this.trapGroup = this.physics.add.staticGroup();
 
+        // 1. 왼쪽 벽
+        const leftWall = this.physics.add.staticImage(-5, 300).setSize(10, 600).setOrigin(0, 0.5);
+        leftWall.visible = false;
+        this.platformGroup.add(leftWall);
+
+        // 2. 오른쪽 벽
+        const rightWall = this.physics.add.staticImage(680, 300).setSize(10, 600).setOrigin(1, 0.5);
+        rightWall.visible = false;
+        this.platformGroup.add(rightWall);
+
         // 플레이어 생성
-        this.controller = new PlayerController(this, 400, 100);
+        this.controller = new PlayerController(this, 333, 10);
         this.player = this.controller.player;
 
         // 점수 텍스트
@@ -25,6 +35,9 @@ export default class MainScene extends Phaser.Scene {
             fill: '#ffffff'
         }).setScrollFactor(0);
 
+        const initPlatfrom = this.physics.add.staticImage(333, 100, `platform4`);
+        initPlatfrom.setScale(0.5).refreshBody();
+        this.platformGroup.add(initPlatfrom);
         // 발판 생성
         this.spawnPlatforms();
 
@@ -40,20 +53,25 @@ export default class MainScene extends Phaser.Scene {
         const totalLayers = 30;
 
         for (let i = 0; i < totalLayers; i++) {
-            const y = 200 + i * platformSpacing;
+            const baseY = 200 + i * platformSpacing; // 200은 y 초기값
 
-            // 올바른 발판
-            const x = Phaser.Math.Between(100, 700);
+            const goodx = Phaser.Math.Between(100, 700);
             const goodIndex = Phaser.Math.Between(1, 7);
-            const platform = this.physics.add.staticImage(x, y, `platform${goodIndex}`);
+            const goodY = baseY - 20;
+            //staticImage는 움직이거나 중력의 영향을 받지않는 정적이미지.
+            const platform = this.physics.add.staticImage(goodx, goodY, `platform${goodIndex}`);
+            platform.setScale(0.5);
+            platform.refreshBody();
             this.platformGroup.add(platform);
 
-            // 함정 발판 (50% 확률)
-            if (Phaser.Math.Between(0, 1)) {
-                const tx = Phaser.Math.Between(100, 700);
+            if (Phaser.Math.Between(0, 1)) { // 함정발판은 50% 확률로 생성
+                const badX = Phaser.Math.Between(100, 700);
                 const badIndex = Phaser.Math.Between(1, 7);
-                const trap = this.physics.add.staticImage(tx, y + 10, `platform${badIndex}`);
+                const badY = baseY + 20;
+                const trap = this.physics.add.staticImage(badX, badY, `platform${badIndex}`);
                 trap.setTint(0xff0000);
+                trap.setScale(0.5);
+                trap.refreshBody();
                 this.trapGroup.add(trap);
             }
         }
