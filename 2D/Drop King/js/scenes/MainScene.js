@@ -97,5 +97,22 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         this.controller.update();
+
+        this.platformGroup.children.iterate((platform)=>{
+            if(platform && platform.y < this.player.y){
+                //충돌 그룹에서 제거하고
+                this.platformGroup.remove(platform);
+                //화면에서도 제거
+                platform.destroy();
+            }
+        });
+        this.trapGroup.children.iterate((trap)=>{
+            if(trap && trap.y < this.player.y){
+                //충돌 그룹에서 제거하고
+                this.trapGroup.remove(trap);
+                //화면에서도 제거
+                trap.destroy();
+            }
+        });
     }
 }
