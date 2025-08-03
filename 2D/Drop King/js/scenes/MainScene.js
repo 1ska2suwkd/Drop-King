@@ -26,12 +26,12 @@ export default class MainScene extends Phaser.Scene {
         this.wallGroup = this.physics.add.staticGroup();
 
         // 1. 왼쪽 벽
-        const leftWall = this.physics.add.staticImage(-2, 300).setSize(10, 600).setOrigin(0, 0.5);
+        const leftWall = this.physics.add.staticImage(-2, 300).setSize(10, 1500).setOrigin(0, 0.5);
         leftWall.visible = false;
         this.wallGroup.add(leftWall);
 
         // 2. 오른쪽 벽
-        const rightWall = this.physics.add.staticImage(670, 300).setSize(10, 600).setOrigin(1, 0.5);
+        const rightWall = this.physics.add.staticImage(670, 300).setSize(10, 1500).setOrigin(1, 0.5);
         rightWall.visible = false;
         this.wallGroup.add(rightWall);
 
@@ -57,6 +57,42 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
 
         this.backgroundChanged = false;
+    }
+
+    update() {
+        this.controller.update();
+        const playerY = this.player.y;
+        const cameraHeight = this.camera.height;
+        //플레이어가 한 층 아래로 내려갔는 지 확인
+        const newLevel = Math.floor(playerY / cameraHeight);
+
+        if (newLevel > this.currentCameraLevel) {
+            this.currentCameraLevel = newLevel;
+            this.tweens.add({
+                targets: this.camera,
+                scrollY: this.currentCameraLevel * cameraHeight,
+                duration: 500,
+            });
+            this.addNextBackground();
+            this.addNextWalls();
+        }
+
+        this.platformGroup.children.iterate((platform) => {
+            if (platform && platform.y < this.player.y) {
+                //충돌 그룹에서 제거하고
+                this.platformGroup.remove(platform);
+                //화면에서도 제거
+                platform.destroy();
+            }
+        });
+        this.trapGroup.children.iterate((trap) => {
+            if (trap && trap.y < this.player.y) {
+                //충돌 그룹에서 제거하고
+                this.trapGroup.remove(trap);
+                //화면에서도 제거
+                trap.destroy();
+            }
+        });
     }
 
     spawnPlatforms() {
@@ -127,45 +163,21 @@ export default class MainScene extends Phaser.Scene {
         this.backgrounds.push(bg);
         this.backgroundIndex = this.getNextBackgroundIndex();
     }
+    addNextWalls() {
+        const wallHeight = 600; // 기존 벽 크기와 동일
+        const wallY = (this.currentCameraLevel + 1) * this.camera.height + wallHeight / 2;
 
+        const leftWall = this.physics.add.staticImage(-2, wallY).setSize(10, wallHeight).setOrigin(0, 0.5);
+        leftWall.visible = false;
+        this.wallGroup.add(leftWall);
+
+        const rightWall = this.physics.add.staticImage(670, wallY).setSize(10, wallHeight).setOrigin(1, 0.5);
+        rightWall.visible = false;
+        this.wallGroup.add(rightWall);
+    }
 
     getNextBackgroundIndex() {
         return this.backgroundIndex % this.totalBackgrounds + 1;
     }
 
-    update() {
-        this.controller.update();
-        const playerY = this.player.y;
-        const cameraHeight = this.camera.height;
-        //플레이어가 한 층 아래로 내려갔는 지 확인
-        const newLevel = Math.floor(playerY / cameraHeight);
-
-        if (newLevel > this.currentCameraLevel) {
-            this.currentCameraLevel = newLevel;
-            this.tweens.add({
-                targets: this.camera,
-                scrollY: this.currentCameraLevel * cameraHeight,
-                duration: 500,
-                ease: 'Sine.easeInOut'
-            });
-            this.addNextBackground();
-        }
-
-        this.platformGroup.children.iterate((platform) => {
-            if (platform && platform.y < this.player.y) {
-                //충돌 그룹에서 제거하고
-                this.platformGroup.remove(platform);
-                //화면에서도 제거
-                platform.destroy();
-            }
-        });
-        this.trapGroup.children.iterate((trap) => {
-            if (trap && trap.y < this.player.y) {
-                //충돌 그룹에서 제거하고
-                this.trapGroup.remove(trap);
-                //화면에서도 제거
-                trap.destroy();
-            }
-        });
-    }
 }
