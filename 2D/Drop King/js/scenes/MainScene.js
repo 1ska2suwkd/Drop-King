@@ -3,6 +3,7 @@ import { PlayerController } from "../playerController.js";
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
+        this.isPreviewing = false;
     }
 
     create() {
@@ -56,7 +57,7 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.platformGroup, this.hitPlatform, null, this);
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
 
-        this.backgroundChanged = false;
+        this.lookDownKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
 
     update() {
@@ -72,6 +73,14 @@ export default class MainScene extends Phaser.Scene {
             
             this.addNextBackground();
             this.addNextWalls();
+        }
+        if(this.lookDownKey.isDown && !this.isPreviewing) {
+            this.camera.scrollY += 500;
+            this.isPreviewing = true;
+        }
+        if(Phaser.Input.Keyboard.JustUp(this.lookDownKey) && this.isPreviewing){
+            this.camera.scrollY -= 500;
+            this.isPreviewing = false;
         }
 
         this.platformGroup.children.iterate((platform) => {
