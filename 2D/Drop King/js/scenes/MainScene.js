@@ -161,7 +161,7 @@ export default class MainScene extends Phaser.Scene {
         this.backgroundIndex = this.getNextBackgroundIndex();
     }
     addNextWalls() {
-        const wallHeight = 600; // 기존 벽 크기와 동일
+        const wallHeight = 600; 
         const wallY = (this.currentCameraLevel + 1) * this.camera.height + wallHeight / 2;
 
         const leftWall = this.physics.add.staticImage(-2, wallY).setSize(10, wallHeight).setOrigin(0, 0.5);
