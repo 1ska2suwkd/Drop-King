@@ -6,24 +6,29 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-        this.background = this.add.image(0, 0, 'background1').setOrigin(0, 0).setScale(2.15);
+         this.background = this.add.image(0, 0, 'background1').setOrigin(0, 0).setScale(2.15);
 
-        // 점수 초기화
+        // 점수 초기
         this.score = 0;
+        //카메라
+        this.camera = this.cameras.main;
+        this.currentCameraLevel = 0; // 현재 카메라 층
+        this.camera.setBounds(0, 0, 800, 10000)
 
         // 발판 그룹 생성
         this.platformGroup = this.physics.add.staticGroup();
         this.trapGroup = this.physics.add.staticGroup();
+        this.wallGroup = this.physics.add.staticGroup();
 
         // 1. 왼쪽 벽
-        const leftWall = this.physics.add.staticImage(-5, 300).setSize(10, 600).setOrigin(0, 0.5);
+        const leftWall = this.physics.add.staticImage(-2, 300).setSize(10, 600).setOrigin(0, 0.5);
         leftWall.visible = false;
-        this.platformGroup.add(leftWall);
+        this.wallGroup.add(leftWall);
 
         // 2. 오른쪽 벽
-        const rightWall = this.physics.add.staticImage(680, 300).setSize(10, 600).setOrigin(1, 0.5);
+        const rightWall = this.physics.add.staticImage(670, 300).setSize(10, 600).setOrigin(1, 0.5);
         rightWall.visible = false;
-        this.platformGroup.add(rightWall);
+        this.wallGroup.add(rightWall);
 
         // 플레이어 생성
         this.controller = new PlayerController(this, 333, 10);
@@ -42,6 +47,7 @@ export default class MainScene extends Phaser.Scene {
         this.spawnPlatforms();
 
         // 충돌 처리
+        this.physics.add.collider(this.player, this.wallGroup, null, null, this);
         this.physics.add.collider(this.player, this.platformGroup, this.hitPlatform, null, this);
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
 
@@ -100,6 +106,20 @@ export default class MainScene extends Phaser.Scene {
 
     update() {
         this.controller.update();
+        const playerY = this.player.y;
+        const cameraHeight = this.camera.height;
+        //플레이어가 한 층 아래로 내려갔는 지 확인
+        const newLevel = Math.floor(playerY / cameraHeight);
+
+        if (newLevel > this.currentCameraLevel) {
+            this.currentCameraLevel = newLevel;
+            this.tweens.add({
+                targets: this.camera,
+                scrollY: this.currentCameraLevel * cameraHeight,
+                duration: 500,
+                ease: 'Sine.easeInOut'
+            });
+        }
 
         this.platformGroup.children.iterate((platform) => {
             if (platform && platform.y < this.player.y) {
