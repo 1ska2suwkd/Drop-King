@@ -6,14 +6,19 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-         this.background = this.add.image(0, 0, 'background1').setOrigin(0, 0).setScale(2.15);
+        this.backgroundIndex = 1;
+        this.totalBackgrounds = 15;
+        this.backgroundHeight = 500; // 배경 하나 높이
+        this.backgrounds = [];
 
-        // 점수 초기
+        this.initBackgrounds(); // 초기 배경 3장 정도 그려놓기
+
+        // 점수 초기화
         this.score = 0;
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층
-        this.camera.setBounds(0, 0, 800, 10000)
+        this.camera.setBounds(0, 0, 666, 10000)
 
         // 발판 그룹 생성
         this.platformGroup = this.physics.add.staticGroup();
@@ -92,16 +97,40 @@ export default class MainScene extends Phaser.Scene {
         this.score += 1;
         this.scoreText.setText(`Score: ${this.score}`);
 
-        // 점수가 500 이상이 되었고 배경이 아직 바뀌지 않았다면 교체
-        if (this.score >= 10 && !this.backgroundChanged) {
-            this.background.setTexture('background2');
-            this.backgroundChanged = true;
-        }
     }
 
     hitTrap(player, trap) {
         // 함정에 닿으면 바로 게임오버
         // this.scene.start('GameOverScene');
+    }
+    initBackgrounds() {
+        for (let i = 0; i < 3; i++) {
+            const key = `background${this.backgroundIndex}`;
+            const bg = this.add.image(0, i * this.backgroundHeight, key)
+                .setOrigin(0, 0)
+                .setDepth(-1)
+                .setScrollFactor(1);
+            this.backgrounds.push(bg);
+            this.backgroundIndex = this.getNextBackgroundIndex();
+        }
+    }
+
+    addNextBackground() {
+        const key = `background${this.backgroundIndex}`;
+        const yPos = this.backgrounds.length * this.backgroundHeight;
+
+        const bg = this.add.image(0, yPos, key)
+            .setOrigin(0, 0)
+            .setDepth(-1)
+            .setScrollFactor(1);
+
+        this.backgrounds.push(bg);
+        this.backgroundIndex = this.getNextBackgroundIndex();
+    }
+
+
+    getNextBackgroundIndex() {
+        return this.backgroundIndex % this.totalBackgrounds + 1;
     }
 
     update() {
@@ -119,6 +148,7 @@ export default class MainScene extends Phaser.Scene {
                 duration: 500,
                 ease: 'Sine.easeInOut'
             });
+            this.addNextBackground();
         }
 
         this.platformGroup.children.iterate((platform) => {

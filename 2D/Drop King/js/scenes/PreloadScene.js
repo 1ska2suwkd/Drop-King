@@ -10,7 +10,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('title', 'assets/title.png');
         for (let i = 1; i <= 7; i++) {
             this.load.image(`platform${i}`, `assets/platforms/platform${i}.png`);
-        }for (let i = 1; i <= 11; i++) {
+        }for (let i = 1; i <= 15; i++) {
             this.load.image(`background${i}`, `assets/Scene/background/background${i}.png`);
         }
 
