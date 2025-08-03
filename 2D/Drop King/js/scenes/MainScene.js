@@ -68,11 +68,8 @@ export default class MainScene extends Phaser.Scene {
 
         if (newLevel > this.currentCameraLevel) {
             this.currentCameraLevel = newLevel;
-            this.tweens.add({
-                targets: this.camera,
-                scrollY: this.currentCameraLevel * cameraHeight,
-                duration: 500,
-            });
+            this.camera.scrollY += 500;
+            
             this.addNextBackground();
             this.addNextWalls();
         }
