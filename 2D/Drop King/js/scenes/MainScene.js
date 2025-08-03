@@ -62,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
             const platform = this.physics.add.staticImage(goodx, goodY, `platform${goodIndex}`);
             platform.setScale(0.5);
             platform.refreshBody();
+            platform.setData('scored', false);
             this.platformGroup.add(platform);
 
             if (Phaser.Math.Between(0, 1)) { // 함정발판은 50% 확률로 생성
@@ -78,13 +79,15 @@ export default class MainScene extends Phaser.Scene {
     }
 
     hitPlatform(player, platform) {
+        if (platform.getData('scored')) {
+            return;
+        }
+        platform.setData('scored', true);
         this.score += 1;
         this.scoreText.setText(`Score: ${this.score}`);
-        // this.platformGroup.remove(platform);
-        // platform.destroy(); // 다시 점수 못 얻게 제거
 
         // 점수가 500 이상이 되었고 배경이 아직 바뀌지 않았다면 교체
-        if (this.score >= 500 && !this.backgroundChanged) {
+        if (this.score >= 10 && !this.backgroundChanged) {
             this.background.setTexture('background2');
             this.backgroundChanged = true;
         }
@@ -98,16 +101,16 @@ export default class MainScene extends Phaser.Scene {
     update() {
         this.controller.update();
 
-        this.platformGroup.children.iterate((platform)=>{
-            if(platform && platform.y < this.player.y){
+        this.platformGroup.children.iterate((platform) => {
+            if (platform && platform.y < this.player.y) {
                 //충돌 그룹에서 제거하고
                 this.platformGroup.remove(platform);
                 //화면에서도 제거
                 platform.destroy();
             }
         });
-        this.trapGroup.children.iterate((trap)=>{
-            if(trap && trap.y < this.player.y){
+        this.trapGroup.children.iterate((trap) => {
+            if (trap && trap.y < this.player.y) {
                 //충돌 그룹에서 제거하고
                 this.trapGroup.remove(trap);
                 //화면에서도 제거
