@@ -176,5 +176,4 @@ export default class MainScene extends Phaser.Scene {
     getNextBackgroundIndex() {
         return this.backgroundIndex % this.totalBackgrounds + 1;
     }
-
 }
