@@ -99,7 +99,7 @@ export default class MainScene extends Phaser.Scene {
         for (let i = 0; i < totalLayers; i++) {
             const baseY = 200 + i * platformSpacing; // 200은 y 초기값
 
-            const goodx = Phaser.Math.Between(100, 700);
+            const goodx = Phaser.Math.Between(0, 666);
             const goodIndex = Phaser.Math.Between(1, 7);
             const goodY = baseY - 20;
             //staticImage는 움직이거나 중력의 영향을 받지않는 정적이미지.
@@ -110,9 +110,9 @@ export default class MainScene extends Phaser.Scene {
             this.platformGroup.add(platform);
 
             if (Phaser.Math.Between(0, 1)) { // 함정발판은 50% 확률로 생성
-                const badX = Phaser.Math.Between(100, 700);
+                const badX = Phaser.Math.Between(0, 666);
                 const badIndex = Phaser.Math.Between(1, 7);
-                const badY = baseY + 20;
+                const badY = baseY + 30;
                 const trap = this.physics.add.staticImage(badX, badY, `platform${badIndex}`);
                 trap.setTint(0xff0000);
                 trap.setScale(0.5);
