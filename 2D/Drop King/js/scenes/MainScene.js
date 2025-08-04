@@ -4,6 +4,9 @@ export default class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
         this.isPreviewing = false;
+        this.platformSpacing = 150;
+        this.totalLayers = 10;
+        this.lastPlatformLevel = 0;
     }
 
     create() {
@@ -19,7 +22,7 @@ export default class MainScene extends Phaser.Scene {
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층
-        this.camera.setBounds(0, 0, 666, 10000)
+        this.camera.setBounds(0, 0, 666, 15000) // 여기 수정 필요
 
         // 발판 그룹 생성
         this.platformGroup = this.physics.add.staticGroup();
@@ -49,8 +52,7 @@ export default class MainScene extends Phaser.Scene {
         const initPlatfrom = this.physics.add.staticImage(333, 100, `platform4`);
         initPlatfrom.setScale(0.5).refreshBody();
         this.platformGroup.add(initPlatfrom);
-        // 발판 생성
-        this.spawnPlatforms();
+        this.nextPlatformY = this.player.y + 200
 
         // 충돌 처리
         this.physics.add.collider(this.player, this.wallGroup, null, null, this);
@@ -67,18 +69,23 @@ export default class MainScene extends Phaser.Scene {
         //플레이어가 한 층 아래로 내려갔는 지 확인
         const newLevel = Math.floor(playerY / cameraHeight);
 
+        while (this.nextPlatformY - this.player.y <= this.camera.height * 2) {
+            this.spawnPlatforms(this.nextPlatformY);
+            this.nextPlatformY += 150 * 10; // 플랫폼 간격 * 개수
+        }
+
         if (newLevel > this.currentCameraLevel) {
             this.currentCameraLevel = newLevel;
             this.camera.scrollY += 500;
-            
+
             this.addNextBackground();
             this.addNextWalls();
         }
-        if(this.lookDownKey.isDown && !this.isPreviewing) {
+        if (this.lookDownKey.isDown && !this.isPreviewing) {
             this.camera.scrollY += 500;
             this.isPreviewing = true;
         }
-        if(Phaser.Input.Keyboard.JustUp(this.lookDownKey) && this.isPreviewing){
+        if (Phaser.Input.Keyboard.JustUp(this.lookDownKey) && this.isPreviewing) {
             this.camera.scrollY -= 500;
             this.isPreviewing = false;
         }
@@ -101,24 +108,21 @@ export default class MainScene extends Phaser.Scene {
         });
     }
 
-    spawnPlatforms() {
-        const platformSpacing = 150;
-        const totalLayers = 30;
-
-        for (let i = 0; i < totalLayers; i++) {
-            const baseY = 200 + i * platformSpacing; // 200은 y 초기값
+    spawnPlatforms(startY) {
+        for (let i = 0; i < this.totalLayers; i++) {
+            const baseY = startY + i * this.platformSpacing;
 
             const goodx = Phaser.Math.Between(0, 666);
             const goodIndex = Phaser.Math.Between(1, 7);
             const goodY = baseY - 20;
-            //staticImage는 움직이거나 중력의 영향을 받지않는 정적이미지.
+
             const platform = this.physics.add.staticImage(goodx, goodY, `platform${goodIndex}`);
             platform.setScale(0.5);
             platform.refreshBody();
             platform.setData('scored', false);
             this.platformGroup.add(platform);
 
-            if (Phaser.Math.Between(0, 1)) { // 함정발판은 50% 확률로 생성
+            if (Phaser.Math.Between(0, 1)) {
                 const badX = Phaser.Math.Between(0, 666);
                 const badIndex = Phaser.Math.Between(1, 7);
                 const badY = baseY + 30;
@@ -170,7 +174,7 @@ export default class MainScene extends Phaser.Scene {
         this.backgroundIndex = this.getNextBackgroundIndex();
     }
     addNextWalls() {
-        const wallHeight = 600; 
+        const wallHeight = 600;
         const wallY = (this.currentCameraLevel + 1) * this.camera.height + wallHeight / 2;
 
         const leftWall = this.physics.add.staticImage(-2, wallY).setSize(10, wallHeight).setOrigin(0, 0.5);
