@@ -8,6 +8,9 @@ export default class MainScene extends Phaser.Scene {
         this.totalLayers = 10;
         this.lastPlatformLevel = 0;
         this.currentPlatform = null;
+        this.elapsedTime = 0;
+        this.timerStarted = false;
+        this.firstPlatformRemoved = false;
     }
 
     create() {
@@ -20,6 +23,11 @@ export default class MainScene extends Phaser.Scene {
 
         // 점수 초기화
         this.score = 0;
+        //타이머
+        this.timerText = this.add.text(10, 40, '00:00:00', {
+            fontSize: '20px',
+            fill: '#ffffff'
+        }).setScrollFactor(0);
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층
@@ -97,6 +105,10 @@ export default class MainScene extends Phaser.Scene {
                 this.platformGroup.remove(platform);
                 //화면에서도 제거
                 platform.destroy();
+                if (!this.firstPlatformRemoved) {
+                    this.firstPlatformRemoved = true;
+                    this.timerStarted = true;
+                }
             }
         });
         this.trapGroup.children.iterate((trap) => {
@@ -114,7 +126,22 @@ export default class MainScene extends Phaser.Scene {
                 this.platformGroup.remove(this.currentPlatform);
                 this.currentPlatform.destroy();
                 this.currentPlatform = null;
+                if (!this.firstPlatformRemoved) {
+                    this.firstPlatformRemoved = true;
+                    this.timerStarted = true;
+                }
             }
+        }
+
+        if (this.timerStarted) {
+            this.elapsedTime += this.game.loop.delta / 1000;
+
+            const totalSeconds = Math.floor(this.elapsedTime);
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+            this.timerText.setText(`${hours}:${minutes}:${seconds}`);
         }
     }
 
