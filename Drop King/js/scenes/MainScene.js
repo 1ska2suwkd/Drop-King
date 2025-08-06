@@ -58,9 +58,9 @@ export default class MainScene extends Phaser.Scene {
             fill: '#ffffff'
         }).setScrollFactor(0);
 
-        const initPlatfrom = this.physics.add.staticImage(333, 100, `platform4`);
-        initPlatfrom.setScale(0.5).refreshBody();
-        this.platformGroup.add(initPlatfrom);
+        this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
+        this.initPlatform.setScale(0.5).refreshBody();
+        this.platformGroup.add(this.initPlatform);
         this.nextPlatformY = this.player.y + 200
 
         // 충돌 처리
@@ -173,7 +173,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     hitPlatform(player, platform) {
-        if (platform.getData('scored')) {
+        if (platform.getData('scored') || platform == this.initPlatform) {
             return;
         }
         platform.setData('scored', true);
