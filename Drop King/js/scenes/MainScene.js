@@ -28,11 +28,11 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '15px',
             fill: '#ffffff',
             fontFamily: '"Press Start 2P"'
-        }).setScrollFactor(0);
+        }).setScrollFactor(0).setDepth(5);
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층
-        this.camera.setBounds(0, 0, 666, 15000) // 여기 수정 필요
+        this.camera.setBounds(0, 0, 666, 30000) // 여기 수정 필요
 
         // 발판 그룹 생성
         this.platformGroup = this.physics.add.staticGroup();
@@ -58,7 +58,7 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '15px',
             fill: '#ffffff',
             fontFamily: '"Press Start 2P"'
-        }).setScrollFactor(0);
+        }).setScrollFactor(0).setDepth(5);
 
         this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
         this.initPlatform.setScale(0.5).refreshBody();
@@ -186,8 +186,18 @@ export default class MainScene extends Phaser.Scene {
     }
 
     hitTrap(player, trap) {
-        // 함정에 닿으면 바로 게임오버
-        // this.scene.start('GameOverScene');
+        if (this.controller.isDead) return; //이미 죽었으면 실행 X
+
+        this.controller.isDead = true;
+        this.player.setVelocityX(0);
+        this.player.play('end', true);
+        this.time.delayedCall(500, () => {
+            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
+
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.start('GameOverScene');
+            });
+        });
     }
 
     initBackgrounds() {

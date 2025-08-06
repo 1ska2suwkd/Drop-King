@@ -18,6 +18,7 @@ export class PlayerController {
 
         this.createAnimations();
         this.player.play('idle');
+        this.isDead = false;
     }
 
     createAnimations() {
@@ -54,9 +55,17 @@ export class PlayerController {
             frameRate: 10,
             repeat: -1
         });
+        anims.create({
+            key: 'end',
+            frames: anims.generateFrameNumbers('player', { start: 7, end: 7 }),
+            frameRate: 100,
+            repeat: -1
+        });
     }
 
     update() {
+        if(this.isDead) return;
+
         const player = this.player;
         const cursors = this.cursors;
         const spaceKey = this.spaceKey;
