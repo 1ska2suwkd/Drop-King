@@ -24,9 +24,10 @@ export default class MainScene extends Phaser.Scene {
         // 점수 초기화
         this.score = 0;
         //타이머
-        this.timerText = this.add.text(10, 40, '00:00:00', {
-            fontSize: '20px',
-            fill: '#ffffff'
+        this.timerText = this.add.text(10, 35, '00:00:00', {
+            fontSize: '15px',
+            fill: '#ffffff',
+            fontFamily: '"Press Start 2P"'
         }).setScrollFactor(0);
         //카메라
         this.camera = this.cameras.main;
@@ -54,8 +55,9 @@ export default class MainScene extends Phaser.Scene {
 
         // 점수 텍스트
         this.scoreText = this.add.text(10, 10, 'Score: 0', {
-            fontSize: '20px',
-            fill: '#ffffff'
+            fontSize: '15px',
+            fill: '#ffffff',
+            fontFamily: '"Press Start 2P"'
         }).setScrollFactor(0);
 
         this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
