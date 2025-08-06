@@ -7,6 +7,7 @@ export default class MainScene extends Phaser.Scene {
         this.platformSpacing = 150;
         this.totalLayers = 10;
         this.lastPlatformLevel = 0;
+        this.currentPlatform = null;
     }
 
     create() {
@@ -106,6 +107,15 @@ export default class MainScene extends Phaser.Scene {
                 trap.destroy();
             }
         });
+        if (this.currentPlatform) {
+            const isStillTouching = this.player.body.touching.down;
+
+            if (!isStillTouching) {
+                this.platformGroup.remove(this.currentPlatform);
+                this.currentPlatform.destroy();
+                this.currentPlatform = null;
+            }
+        }
     }
 
     spawnPlatforms(startY) {
@@ -143,12 +153,14 @@ export default class MainScene extends Phaser.Scene {
         this.score += 1;
         this.scoreText.setText(`Score: ${this.score}`);
 
+        this.currentPlatform = platform;
     }
 
     hitTrap(player, trap) {
         // 함정에 닿으면 바로 게임오버
         // this.scene.start('GameOverScene');
     }
+
     initBackgrounds() {
         for (let i = 0; i < 3; i++) {
             const key = `background${this.backgroundIndex}`;
