@@ -10,6 +10,7 @@ export default class MainScene extends Phaser.Scene {
         this.currentPlatform = null;
         this.elapsedTime = 0;
         this.timerStarted = false;
+        this.remainingTime = 60;
         this.firstPlatformRemoved = false;
     }
 
@@ -24,7 +25,7 @@ export default class MainScene extends Phaser.Scene {
         // 점수 초기화
         this.score = 0;
         //타이머
-        this.timerText = this.add.text(10, 35, '00:00:00', {
+        this.timerText = this.add.text(10, 35, '01:00', {
             fontSize: '15px',
             fill: '#ffffff',
             fontFamily: '"Press Start 2P"'
@@ -136,15 +137,36 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (this.timerStarted) {
-            this.elapsedTime += this.game.loop.delta / 1000;
+    this.remainingTime -= this.game.loop.delta / 1000;
 
-            const totalSeconds = Math.floor(this.elapsedTime);
-            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-            const seconds = String(totalSeconds % 60).padStart(2, '0');
+    const totalSeconds = Math.max(0, Math.floor(this.remainingTime));
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
 
-            this.timerText.setText(`${hours}:${minutes}:${seconds}`);
-        }
+    this.timerText.setText(`${minutes}:${seconds}`);
+
+    if (this.remainingTime <= 0) {
+        this.timerStarted = false;
+        this.remainingTime = 0;
+
+        this.endGame(timeOverScene);
+    }
+}
+    }
+
+    endGame(targetScene){
+        if (this.controller.isDead) return; //이미 죽었으면 실행 X
+
+        this.controller.isDead = true;
+        this.player.setVelocityX(0);
+        this.player.play('end', true);
+        this.time.delayedCall(500, () => {
+            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
+
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                this.scene.start(targetScene);
+            });
+        });
     }
 
     spawnPlatforms(startY) {
@@ -186,18 +208,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     hitTrap(player, trap) {
-        if (this.controller.isDead) return; //이미 죽었으면 실행 X
-
-        this.controller.isDead = true;
-        this.player.setVelocityX(0);
-        this.player.play('end', true);
-        this.time.delayedCall(500, () => {
-            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
-
-            this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('GameOverScene');
-            });
-        });
+        this.endGame('GameOverScene');
     }
 
     initBackgrounds() {
