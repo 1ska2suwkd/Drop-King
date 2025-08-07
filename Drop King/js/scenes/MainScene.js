@@ -149,7 +149,7 @@ export default class MainScene extends Phaser.Scene {
         this.timerStarted = false;
         this.remainingTime = 0;
 
-        this.endGame(timeOverScene);
+        this.endGame('timeOverScene');
     }
 }
     }
