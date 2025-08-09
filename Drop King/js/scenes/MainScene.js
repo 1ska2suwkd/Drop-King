@@ -108,9 +108,11 @@ export default class MainScene extends Phaser.Scene {
                 this.platformGroup.remove(platform);
                 //화면에서도 제거
                 platform.destroy();
+                this.score+=1;
                 if (!this.firstPlatformRemoved) {
                     this.firstPlatformRemoved = true;
                     this.timerStarted = true;
+                    this.score-=1;
                 }
             }
         });
