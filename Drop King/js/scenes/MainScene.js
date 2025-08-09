@@ -148,8 +148,11 @@ export default class MainScene extends Phaser.Scene {
             if (this.remainingTime <= 0) {
                 this.timerStarted = false;
                 this.remainingTime = 0;
-
-                this.endGame('GameOverScene', 'timeOver');
+                if (this.score >= 100) {
+                    this.endGame('GameClearScene', 'gameClear');
+                } else {
+                    this.endGame('GameOverScene', 'timeOver');
+                }
             }
         }
     }
@@ -164,7 +167,7 @@ export default class MainScene extends Phaser.Scene {
             this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
 
             this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start(targetScene, { image: image }, { score: this.score });
+                this.scene.start(targetScene, { image, score: this.score });
             });
         });
     }

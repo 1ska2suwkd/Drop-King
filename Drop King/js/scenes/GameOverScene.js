@@ -15,11 +15,11 @@ export default class GameOverScene extends Phaser.Scene {
         .setScale(0.5);
 
         const style = { fontFamily: '"Press Start 2P"', fontSize: '20px', color: '#fff', align: 'center' };
-        const scoreText = this.add.text(centerX, 260, `Score: ${current}`, style).setOrigin(0.5);
-        this.add.text(centerX, 300, `Best:  ${best}`, style).setOrigin(0.5);
+        const scoreText = this.add.text(centerX, 300, `Score: ${current}`, style).setOrigin(0.5);
+        this.add.text(centerX, 260, `Best:  ${best}`, style).setOrigin(0.5);
 
         const tick = this.time.addEvent({
-            delay: 100,
+            delay: 50,
             loop: true,
             callback: () => {
                 if (current > 0) {

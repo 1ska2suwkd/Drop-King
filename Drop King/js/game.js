@@ -3,6 +3,7 @@ import StartScene from './scenes/StartScene.js';
 import MainScene from './scenes/MainScene.js';
 import IntroScene from './scenes/IntroScene.js';
 import GameOverScene from './scenes/GameOverScene.js'
+import GameClearScene from './scenes/GameClearScene.js'
 
 const config = { //config는 인스턴스 초기화 역할
     type: Phaser.AUTO, //랜더링 방식
@@ -22,7 +23,7 @@ const config = { //config는 인스턴스 초기화 역할
         }
         
     },
-    scene: [PreloadScene, StartScene, IntroScene, GameOverScene, MainScene]
+    scene: [PreloadScene, StartScene, IntroScene, MainScene, GameClearScene, GameOverScene]
 };
 
 const game = new Phaser.Game(config);
