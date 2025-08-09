@@ -9,11 +9,13 @@ export default class GameOverScene extends Phaser.Scene {
 
         const best = Number(localStorage.getItem('bestScore') || 0);
 
-        this.add.image(centerX, 110, 'gameOver').setOrigin(0.5).setScale(0.8);
+        this.add.image(centerX+10, 140, 'gameOver')
+        .setOrigin(0.5)
+        .setScale(0.5);
 
         const style = { fontFamily: '"Press Start 2P"', fontSize: '20px', color: '#fff', align: 'center' };
-        const scoreText = this.add.text(centerX, 200, `Score: ${current}`, style).setOrigin(0.5);
-        this.add.text(centerX, 240, `Best:  ${best}`, style).setOrigin(0.5);
+        const scoreText = this.add.text(centerX, 260, `Score: ${current}`, style).setOrigin(0.5);
+        this.add.text(centerX, 300, `Best:  ${best}`, style).setOrigin(0.5);
 
         const tick = this.time.addEvent({
             delay: 100,

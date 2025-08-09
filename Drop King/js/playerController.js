@@ -87,7 +87,7 @@ export class PlayerController {
                 }
 
                 if (this.jumpPower < this.maxJumpPower) {
-                    this.jumpPower += 20;
+                    this.jumpPower += 25;
                 }
 
                 if (cursors.left.isDown) {
@@ -112,7 +112,7 @@ export class PlayerController {
                     // 수직 점프 실행
                     player.setVelocityY(-this.jumpPower);
 
-                    const jumpHorizontalSpeed = 200;
+                    const jumpHorizontalSpeed = 210;
                     if (this.leftJump) {
                         player.setVelocityX(-jumpHorizontalSpeed);
                     } else if (this.rightJump) {
