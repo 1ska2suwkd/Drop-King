@@ -6,10 +6,11 @@ export default class GameOverScene extends Phaser.Scene {
     create(data) {
         const centerX = this.cameras.main.width / 2;
         let current = Number(data?.score ?? 0);
+        let image = String(data.image);
 
         const best = Number(localStorage.getItem('bestScore') || 0);
 
-        this.add.image(centerX+10, 140, 'gameOver')
+        this.add.image(centerX+10, 140, image)
         .setOrigin(0.5)
         .setScale(0.5);
 

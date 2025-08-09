@@ -106,11 +106,11 @@ export default class MainScene extends Phaser.Scene {
                 this.platformGroup.remove(platform);
                 //화면에서도 제거
                 platform.destroy();
-                this.score+=1;
+                this.score += 2;
                 if (!this.firstPlatformRemoved) {
                     this.firstPlatformRemoved = true;
                     this.timerStarted = true;
-                    this.score-=1;
+                    this.score -= 2;
                 }
             }
         });
@@ -137,24 +137,24 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (this.timerStarted) {
-    this.remainingTime -= this.game.loop.delta / 1000;
+            this.remainingTime -= this.game.loop.delta / 1000;
 
-    const totalSeconds = Math.max(0, Math.floor(this.remainingTime));
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-    const seconds = String(totalSeconds % 60).padStart(2, '0');
+            const totalSeconds = Math.max(0, Math.floor(this.remainingTime));
+            const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
 
-    this.timerText.setText(`${minutes}:${seconds}`);
+            this.timerText.setText(`${minutes}:${seconds}`);
 
-    if (this.remainingTime <= 0) {
-        this.timerStarted = false;
-        this.remainingTime = 0;
+            if (this.remainingTime <= 0) {
+                this.timerStarted = false;
+                this.remainingTime = 0;
 
-        this.endGame('timeOverScene');
+                this.endGame('GameOverScene', 'timeOver');
+            }
+        }
     }
-}
-    }
 
-    endGame(targetScene){
+    endGame(targetScene, image) {
         if (this.controller.isDead) return; //이미 죽었으면 실행 X
 
         this.controller.isDead = true;
@@ -164,7 +164,7 @@ export default class MainScene extends Phaser.Scene {
             this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
 
             this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start(targetScene, {score: this.score});
+                this.scene.start(targetScene, { image: image }, { score: this.score });
             });
         });
     }
@@ -209,7 +209,7 @@ export default class MainScene extends Phaser.Scene {
 
     hitTrap(player, trap) {
         this.scoreText.setText(`Score: ${this.score}`);
-        this.endGame('GameOverScene');
+        this.endGame('GameOverScene', 'gameOver');
     }
 
     initBackgrounds() {

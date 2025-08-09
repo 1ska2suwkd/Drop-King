@@ -9,6 +9,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('IntroBackground', 'assets/Scene/IntroScene.png');
         this.load.image('title', 'assets/title.png');
         this.load.image('gameOver', 'assets/gameOver.png');
+        this.load.image('timeOver', 'assets/timeOver.png');
         for (let i = 1; i <= 7; i++) {
             this.load.image(`platform${i}`, `assets/platforms/platform${i}.png`);
         }for (let i = 1; i <= 15; i++) {
@@ -23,7 +24,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     create() {
         // this.scene.start('StartScene');
-        // this.scene.start('MainScene');
-        this.scene.start('GameOverScene');
+        this.scene.start('MainScene');
+        // this.scene.start('GameOverScene');
     }
 }
