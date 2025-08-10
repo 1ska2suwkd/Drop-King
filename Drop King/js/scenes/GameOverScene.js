@@ -43,6 +43,5 @@ export default class GameOverScene extends Phaser.Scene {
 
         // 입력 → 메인 재시작
         this.input.keyboard.once('keydown', () => this.scene.start('MainScene'));
-        this.input.once('pointerdown', () => this.scene.start('MainScene'));
     }
 }

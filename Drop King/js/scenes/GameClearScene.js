@@ -29,7 +29,6 @@ export default class GameClearScene extends Phaser.Scene {
 
         // 아무 키/클릭 → 메인 재시작 (원하면 StartScene으로 변경)
         this.input.keyboard.once('keydown', () => this.scene.start('MainScene'));
-        this.input.once('pointerdown', () => this.scene.start('MainScene'));
     }
 
 }

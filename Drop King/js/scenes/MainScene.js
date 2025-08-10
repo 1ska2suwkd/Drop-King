@@ -4,67 +4,74 @@ import { baseTextStyle, addFixedText } from "../ui/TextStyles.js";
 export default class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
+    }
+
+    init() {
+        // 게임 상태 변수 전부 초기화
         this.isPreviewing = false;
         this.platformSpacing = 150;
         this.totalLayers = 10;
         this.lastPlatformLevel = 0;
         this.currentPlatform = null;
+
         this.elapsedTime = 0;
         this.timerStarted = false;
-        this.remainingTime = 60;
+        this.remainingTime = 60;     // 타이머 리셋
         this.firstPlatformRemoved = false;
+
+        // 배경 관련 리셋
         this.backgroundIndex = 1;
         this.totalBackgrounds = 15;
-        this.backgroundHeight = 500; // 배경 하나 높이
+        this.backgroundHeight = 500;
         this.backgrounds = [];
+
+        // 카메라/스코어 리셋
+        this.score = 0;
+        this.currentCameraLevel = 0;
     }
 
     create() {
-        this.initBackgrounds(); // 초기 배경 3장 정도 그려놓기
+        //Group init
+        if (this.platformGroup) this.platformGroup.destroy(true);
+        if (this.trapGroup) this.trapGroup.destroy(true);
+        if (this.wallGroup) this.wallGroup.destroy(true);
 
-        // 점수 초기화
-        this.score = 0;
+        // 카메라 초기 상태로
+        this.camera = this.cameras.main;
+        this.camera.setBounds(0, 0, 666, 30000);
+        this.camera.scrollY = 0;
+
+        // UI
         this.timerText = addFixedText(this, 10, 40, '01:00', baseTextStyle());
         this.scoreLabel = addFixedText(this, 10, 10, 'Score: ', baseTextStyle());
-        this.scoreValue = addFixedText(
-            this,
-            this.scoreLabel.x + this.scoreLabel.width - 10,
-            10, String(this.score), baseTextStyle('#ff0000'));
+        this.scoreValue = addFixedText(this, this.scoreLabel.x + this.scoreLabel.width - 10, 10, String(this.score), baseTextStyle('#ff0000'));
 
-        //카메라
-        this.camera = this.cameras.main;
-        this.currentCameraLevel = 0; // 현재 카메라 층
-        this.camera.setBounds(0, 0, 666, 30000) // 여기 수정 필요
-
-        // 발판 그룹 생성
+        // 그룹 재생성
         this.platformGroup = this.physics.add.staticGroup();
         this.trapGroup = this.physics.add.staticGroup();
         this.wallGroup = this.physics.add.staticGroup();
 
-        // 1. 왼쪽 벽
-        const leftWall = this.physics.add.staticImage(-2, 300).setSize(10, 1500).setOrigin(0, 0.5);
-        leftWall.visible = false;
-        this.wallGroup.add(leftWall);
+        // 벽 재생성
+        const leftWall = this.physics.add.staticImage(-2, 300).setSize(10, 1500).setOrigin(0, 0.5); leftWall.visible = false; this.wallGroup.add(leftWall);
+        const rightWall = this.physics.add.staticImage(670, 300).setSize(10, 1500).setOrigin(1, 0.5); rightWall.visible = false; this.wallGroup.add(rightWall);
 
-        // 2. 오른쪽 벽
-        const rightWall = this.physics.add.staticImage(670, 300).setSize(10, 1500).setOrigin(1, 0.5);
-        rightWall.visible = false;
-        this.wallGroup.add(rightWall);
-
-        // 플레이어 생성
+        // 플레이어
         this.controller = new PlayerController(this, 333, 10);
         this.player = this.controller.player;
 
-        this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
-        this.initPlatform.setScale(0.5).refreshBody();
+        // 시작 발판
+        this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`).setScale(0.5);
+        this.initPlatform.refreshBody();
         this.platformGroup.add(this.initPlatform);
-        this.nextPlatformY = this.player.y + 200
+        this.nextPlatformY = this.player.y + 200;
 
-        // 충돌 처리
-        this.physics.add.collider(this.player, this.wallGroup, null, null, this);
+        // 배경 3장 깔기 (리셋된 backgrounds 사용)
+        this.initBackgrounds();
+
+        // 충돌/키
+        this.physics.add.collider(this.player, this.wallGroup);
         this.physics.add.collider(this.player, this.platformGroup, this.hitPlatform, null, this);
         this.physics.add.collider(this.player, this.trapGroup, this.hitTrap, null, this);
-
         this.lookDownKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
 
