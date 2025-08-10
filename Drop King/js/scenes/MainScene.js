@@ -25,9 +25,35 @@ export default class MainScene extends Phaser.Scene {
         // 점수 초기화
         this.score = 0;
         //타이머
-        this.timerText = this.add.text(10, 35, '01:00', {
-            fontSize: '25px',
+        this.timerText = this.add.text(10, 40, '01:00', {
+            fontSize: '20px',
             fill: '#ffffff',
+            fontFamily: '"Orbitron"',
+            padding: { left: 10, right: 10, top: 10, bottom: 12 },
+            resolution: 2,
+            shadow: {
+                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
+        }).setScrollFactor(0).setDepth(5);
+        // Score 라벨 (흰색)
+        this.scoreLabel = this.add.text(10, 10, 'Score: ', {
+            fontSize: '20px',
+            fill: '#ffffff',
+            fontFamily: '"Orbitron"',
+            padding: { left: 10, right: 10, top: 10, bottom: 12 },
+            resolution: 2,
+            shadow: {
+                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
+            }).setScrollFactor(0).setDepth(5);
+
+        // Score 값 (빨간색)
+        this.scoreValue = this.add.text(this.scoreLabel.x + this.scoreLabel.width-10, 10, this.score, {
+            fontSize: '20px',
+            fill: '#ff0000ff',
+            fontFamily: '"Orbitron"',
+            padding: { left: 10, right: 10, top: 10, bottom: 12 },
+            resolution: 2,
+            shadow: {
+                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
         }).setScrollFactor(0).setDepth(5);
         //카메라
         this.camera = this.cameras.main;
@@ -53,11 +79,7 @@ export default class MainScene extends Phaser.Scene {
         this.controller = new PlayerController(this, 333, 10);
         this.player = this.controller.player;
 
-        // 점수 텍스트
-        this.scoreText = this.add.text(10, 10, 'Score: 0', {
-            fontSize: '25px',
-            fill: '#ffffff',
-        }).setScrollFactor(0).setDepth(5);
+
 
         this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
         this.initPlatform.setScale(0.5).refreshBody();
@@ -205,13 +227,13 @@ export default class MainScene extends Phaser.Scene {
         }
         platform.setData('scored', true);
         this.score += 1;
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.scoreValue.setText(`${this.score}`);
 
         this.currentPlatform = platform;
     }
 
     hitTrap(player, trap) {
-        this.scoreText.setText(`Score: ${this.score}`);
+        this.scoreValue.setText(`${this.score}`);
         this.endGame('GameOverScene', 'gameOver');
     }
 
