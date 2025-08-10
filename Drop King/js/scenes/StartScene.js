@@ -146,7 +146,6 @@ export default class StartScene extends Phaser.Scene {
 
     update() {
         const cursors = this.controller.cursors;
-        const spaceKey = this.controller.spaceKey;
 
         if (this.start) {
             this.controller.player.play('end', true);
