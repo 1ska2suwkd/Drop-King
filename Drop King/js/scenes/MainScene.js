@@ -13,14 +13,13 @@ export default class MainScene extends Phaser.Scene {
         this.timerStarted = false;
         this.remainingTime = 60;
         this.firstPlatformRemoved = false;
-    }
-
-    create() {
         this.backgroundIndex = 1;
         this.totalBackgrounds = 15;
         this.backgroundHeight = 500; // 배경 하나 높이
         this.backgrounds = [];
+    }
 
+    create() {
         this.initBackgrounds(); // 초기 배경 3장 정도 그려놓기
 
         // 점수 초기화
@@ -31,7 +30,7 @@ export default class MainScene extends Phaser.Scene {
             this,
             this.scoreLabel.x + this.scoreLabel.width - 10,
             10, String(this.score), baseTextStyle('#ff0000'));
-            
+
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층

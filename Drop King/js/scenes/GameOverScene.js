@@ -16,15 +16,16 @@ export default class GameOverScene extends Phaser.Scene {
             .setScale(0.5);
 
         // Best Score (노란색)
-        const bestText = this.add.text(centerX, 260, `Best Score\n${best}`, {
-            ...baseTextStyle('#FFD700', '25px')
-        }).setOrigin(0.5).setLineSpacing(6);
+        this.add.text(
+            centerX, 260, `Best Score\n${best}`,
+            baseTextStyle('#FFD700', '25px')
+        ).setOrigin(0.5).setLineSpacing(6);
 
         // Score (흰색)
-        const scoreText = this.add.text(centerX, 350, `Score\n${current}`, {
-            ...baseText,
-            color: '#FFFFFF'
-        }).setOrigin(0.5).setLineSpacing(6);
+        const scoreText = this.add.text(
+            centerX, 350, `Score\n${current}`,
+            baseTextStyle('#FFFFFF', '25px')
+        ).setOrigin(0.5).setLineSpacing(6);
 
         // 점수 감소 애니메이션
         const tick = this.time.addEvent({

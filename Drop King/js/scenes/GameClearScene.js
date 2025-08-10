@@ -17,11 +17,11 @@ export default class GameClearScene extends Phaser.Scene {
         this.add.image(333, 250, 'gameClear')
             .setScale(0.75);
 
-        const bestText = this.add.text(centerX, 260, `Best Score\n${best}`, {
+        this.add.text(centerX, 260, `Best Score\n${best}`, {
             ...strokedTextStyle('#FFD700', '30px')
         }).setOrigin(0.5).setLineSpacing(6);
 
-        const scoreText = this.add.text(centerX, 370, `Score\n${score}`, {
+        this.add.text(centerX, 370, `Score\n${score}`, {
             ...strokedTextStyle('#FFFFFF', '30px')
         }).setOrigin(0.5).setLineSpacing(6);
 
