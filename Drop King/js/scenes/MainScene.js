@@ -1,4 +1,5 @@
 import { PlayerController } from "../playerController.js";
+import { baseTextStyle, addFixedText } from "../ui/TextStyles.js";
 
 export default class MainScene extends Phaser.Scene {
     constructor() {
@@ -24,37 +25,13 @@ export default class MainScene extends Phaser.Scene {
 
         // 점수 초기화
         this.score = 0;
-        //타이머
-        this.timerText = this.add.text(10, 40, '01:00', {
-            fontSize: '20px',
-            fill: '#ffffff',
-            fontFamily: '"Orbitron"',
-            padding: { left: 10, right: 10, top: 10, bottom: 12 },
-            resolution: 2,
-            shadow: {
-                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
-        }).setScrollFactor(0).setDepth(5);
-        // Score 라벨 (흰색)
-        this.scoreLabel = this.add.text(10, 10, 'Score: ', {
-            fontSize: '20px',
-            fill: '#ffffff',
-            fontFamily: '"Orbitron"',
-            padding: { left: 10, right: 10, top: 10, bottom: 12 },
-            resolution: 2,
-            shadow: {
-                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
-            }).setScrollFactor(0).setDepth(5);
-
-        // Score 값 (빨간색)
-        this.scoreValue = this.add.text(this.scoreLabel.x + this.scoreLabel.width-10, 10, this.score, {
-            fontSize: '20px',
-            fill: '#ff0000ff',
-            fontFamily: '"Orbitron"',
-            padding: { left: 10, right: 10, top: 10, bottom: 12 },
-            resolution: 2,
-            shadow: {
-                offsetX: 0, offsetY: 1, blur: 4, color: '#00000066'}
-        }).setScrollFactor(0).setDepth(5);
+        this.timerText = addFixedText(this, 10, 40, '01:00', baseTextStyle());
+        this.scoreLabel = addFixedText(this, 10, 10, 'Score: ', baseTextStyle());
+        this.scoreValue = addFixedText(
+            this,
+            this.scoreLabel.x + this.scoreLabel.width - 10,
+            10, String(this.score), baseTextStyle('#ff0000'));
+            
         //카메라
         this.camera = this.cameras.main;
         this.currentCameraLevel = 0; // 현재 카메라 층
@@ -78,8 +55,6 @@ export default class MainScene extends Phaser.Scene {
         // 플레이어 생성
         this.controller = new PlayerController(this, 333, 10);
         this.player = this.controller.player;
-
-
 
         this.initPlatform = this.physics.add.staticImage(333, 100, `platform4`);
         this.initPlatform.setScale(0.5).refreshBody();
