@@ -26,7 +26,7 @@ export default class StartScene extends Phaser.Scene {
             });
         }
 
-        this.controller = new PlayerController(this, 400, 300);
+        this.controller = new PlayerController(this, 333, 400);
         this.physics.add.collider(this.controller.player, this.ground);
     }
 
