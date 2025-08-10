@@ -27,6 +27,11 @@ export default class GameOverScene extends Phaser.Scene {
             baseTextStyle('#FFFFFF', '25px')
         ).setOrigin(0.5).setLineSpacing(6);
 
+        this.add.text(
+            560, 420, `재시작하려면 아무 버튼이나 누르세요`,
+            baseTextStyle('#353535ff', '12px')
+        ).setOrigin(0.5).setLineSpacing(6);
+
         // 점수 감소 애니메이션
         const tick = this.time.addEvent({
             delay: 50,
