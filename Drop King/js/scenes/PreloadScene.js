@@ -22,6 +22,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.tilemapTiledJSON('map', 'assets/Scene/map.json');
         this.load.image('IntroBackground', 'assets/Scene/IntroScene.png');
         this.load.image('title', 'assets/title.png');
+        this.load.image('controls', 'assets/controls.png');
         this.load.image('gameOver', 'assets/gameOver.png');
         this.load.image('gameClear', 'assets/gameClear.png');
         this.load.image('timeOver', 'assets/timeOver.png');
@@ -39,7 +40,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     create() {
         this.scene.start('StartScene');
-        
+
         // this.scene.start('MainScene');
         // this.scene.start('GameOverScene');
         // this.scene.start('GameClearScene');
