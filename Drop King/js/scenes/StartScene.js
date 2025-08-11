@@ -43,7 +43,7 @@ class ProximityPopup extends Phaser.GameObjects.Container {
         this.scene.tweens.killTweensOf(this.img);
     }
 
-    #setState(state){
+    #setState(state) {
         this.#killTweens();
         this.state = state;
     }
@@ -102,9 +102,9 @@ export default class StartScene extends Phaser.Scene {
 
         // 위치(x,y)와 메시지는 원하는 곳으로 바꿔서 쓰면 됨.
         this.popups = [
-    new ProximityPopup(this, 480, 310, 'controls'),
-    // new ProximityPopup(this, x, y, '다른텍스처')
-  ];
+            new ProximityPopup(this, 480, 310, 'controls'),
+            // new ProximityPopup(this, x, y, '다른텍스처')
+        ];
     }
 
     update() {
@@ -122,11 +122,11 @@ export default class StartScene extends Phaser.Scene {
 
         // [ADD] 팝업 업데이트
         const player = this.controller.player;
-         if (this.popups) {
-    for (let i = 0; i < this.popups.length; i++) {
-        this.popups[i].update(player);
-    }
-}
+        if (this.popups) {
+            for (let i = 0; i < this.popups.length; i++) {
+                this.popups[i].update(player);
+            }
+        }
 
         // 텐트 안으로 떨어지면 인트로 씬으로 변경
         if (player.y > 650) {
