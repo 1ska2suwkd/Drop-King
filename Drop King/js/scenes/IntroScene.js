@@ -16,7 +16,7 @@ export default class IntroScene extends Phaser.Scene {
 
         const title = this.add.image(333, 250, 'title')
             .setOrigin(0.5)
-            .setScale(0.4)
+            .setScale(0.45)
             .setAlpha(0); // 투명
 
         // 10초에 걸쳐 알파값을 1로 천천히 증가시킴
