@@ -132,10 +132,6 @@ export default class MainScene extends Phaser.Scene {
                 this.platformGroup.remove(this.currentPlatform);
                 this.currentPlatform.destroy();
                 this.currentPlatform = null;
-                if (!this.firstPlatformRemoved) {
-                    this.firstPlatformRemoved = true;
-                    this.timerStarted = true;
-                }
             }
         }
 
@@ -167,7 +163,7 @@ export default class MainScene extends Phaser.Scene {
         this.player.setVelocityX(0);
         this.player.play('end', true);
         this.time.delayedCall(500, () => {
-            this.cameras.main.fadeOut(5000, 0, 0, 0); // 1초간 페이드 아웃
+            this.cameras.main.fadeOut(5000, 0, 0, 0); 
 
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.scene.start(targetScene, { image, score: this.score });
@@ -212,7 +208,6 @@ export default class MainScene extends Phaser.Scene {
 
         this.currentPlatform = platform;
     }
-
     hitTrap(player, trap) {
         this.scoreValue.setText(`${this.score}`);
         this.endGame('GameOverScene', 'gameOver');
@@ -229,7 +224,6 @@ export default class MainScene extends Phaser.Scene {
             this.backgroundIndex = this.getNextBackgroundIndex();
         }
     }
-
     addNextBackground() {
         const key = `background${this.backgroundIndex}`;
         const yPos = this.backgrounds.length * this.backgroundHeight;
@@ -242,6 +236,9 @@ export default class MainScene extends Phaser.Scene {
         this.backgrounds.push(bg);
         this.backgroundIndex = this.getNextBackgroundIndex();
     }
+    getNextBackgroundIndex() {
+        return this.backgroundIndex % this.totalBackgrounds + 1;
+    }
     addNextWalls() {
         const wallHeight = 600;
         const wallY = (this.currentCameraLevel + 1) * this.camera.height + wallHeight / 2;
@@ -253,9 +250,5 @@ export default class MainScene extends Phaser.Scene {
         const rightWall = this.physics.add.staticImage(670, wallY).setSize(10, wallHeight).setOrigin(1, 0.5);
         rightWall.visible = false;
         this.wallGroup.add(rightWall);
-    }
-
-    getNextBackgroundIndex() {
-        return this.backgroundIndex % this.totalBackgrounds + 1;
     }
 }

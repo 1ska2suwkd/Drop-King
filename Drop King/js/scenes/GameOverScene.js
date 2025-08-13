@@ -7,7 +7,7 @@ export default class GameOverScene extends Phaser.Scene {
 
     create(data) {
         const centerX = this.cameras.main.width / 2;
-        let current = Number(data?.score ?? 0);
+        let score = Number(data?.score ?? 0);
         const image = String(data.image);
         const best = Number(localStorage.getItem('bestScore') || 0);
 
@@ -23,7 +23,7 @@ export default class GameOverScene extends Phaser.Scene {
 
         // Score (흰색)
         const scoreText = this.add.text(
-            centerX, 350, `Score\n${current}`,
+            centerX, 350, `Score\n${score}`,
             baseTextStyle('#FFFFFF', '25px')
         ).setOrigin(0.5).setLineSpacing(6);
 
@@ -37,9 +37,9 @@ export default class GameOverScene extends Phaser.Scene {
             delay: 50,
             loop: true,
             callback: () => {
-                if (current > 0) {
-                    current -= 1;
-                    scoreText.setText(`Score\n${current}`);
+                if (score > 0) {
+                    score -= 1;
+                    scoreText.setText(`Score\n${score}`);
                 } else {
                     tick.remove();
                 }
