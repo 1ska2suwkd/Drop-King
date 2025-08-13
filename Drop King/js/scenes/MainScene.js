@@ -163,7 +163,7 @@ export default class MainScene extends Phaser.Scene {
         this.player.setVelocityX(0);
         this.player.play('end', true);
         this.time.delayedCall(500, () => {
-            this.cameras.main.fadeOut(5000, 0, 0, 0); 
+            this.cameras.main.fadeOut(5000, 0, 0, 0);
 
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.scene.start(targetScene, { image, score: this.score });

@@ -9,19 +9,19 @@ export default class GameOverScene extends Phaser.Scene {
         const centerX = this.cameras.main.width / 2;
         let score = Number(data?.score ?? 0);
         const image = String(data.image);
-        const best = Number(localStorage.getItem('bestScore') || 0);
+        const bestScore = Number(localStorage.getItem('bestScore') || 0);
 
         this.add.image(centerX + 10, 140, image)
             .setOrigin(0.5)
             .setScale(0.5);
 
-        // Best Score (노란색)
+        // Best Score
         this.add.text(
-            centerX, 260, `Best Score\n${best}`,
+            centerX, 260, `Best Score\n${bestScore}`,
             baseTextStyle('#FFD700', '25px')
         ).setOrigin(0.5).setLineSpacing(6);
 
-        // Score (흰색)
+        // Score
         const scoreText = this.add.text(
             centerX, 350, `Score\n${score}`,
             baseTextStyle('#FFFFFF', '25px')
@@ -46,7 +46,7 @@ export default class GameOverScene extends Phaser.Scene {
             }
         });
 
-        // 입력 → 메인 재시작
+        // 아무 키/클릭 → 메인 재시작
         this.input.keyboard.once('keydown', () => this.scene.start('MainScene'));
     }
 }
